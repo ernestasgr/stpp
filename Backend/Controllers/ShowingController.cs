@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,10 +64,30 @@ public class ShowingController : ControllerBase
             new ShowingDTO(showing.Number, showing.StartTime, showing.EndTime, showing.MovieId));
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ShowingDTO>>> GetAll(int movieId = -1)
+    [HttpGet(Name = "GetManyShowings")]
+    public async Task<ActionResult<IEnumerable<ShowingDTO>>> GetMany([FromQuery] SearchParameters parameters, int movieId = -1)
     {
-        var showings = await _showingRepository.GetAllAsync(movieId);
+        var showings = await _showingRepository.GetManyAsync(movieId, parameters: parameters);
+
+        var previousPageLink = showings.HasPrevious ?
+            CreateShowingsResourceUri(parameters, ResourceUriType.PreviousPage) : null;
+
+        var nextPageLink = showings.HasNext ?
+            CreateShowingsResourceUri(parameters, ResourceUriType.NextPage) : null;
+
+        var paginationMetadata = new
+        {
+            totalCount = showings.TotalCount,
+            pageSize = showings.PageSize,
+            currentPage = showings.CurrentPage,
+            totalPages = showings.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        //200
         return Ok(showings.Select(s => new ShowingDTO(
             s.Number,
             s.StartTime,
@@ -132,5 +153,33 @@ public class ShowingController : ControllerBase
         await _showingRepository.RemoveAsync(showing);
 
         return NoContent();
+    }
+
+    private string? CreateShowingsResourceUri(
+        SearchParameters showingSearchParametersDto,
+        ResourceUriType type)
+    {
+        var result = type switch
+        {
+            ResourceUriType.PreviousPage => Url.Link("GetManyShowings",
+                new
+                {
+                    pageNumber = showingSearchParametersDto.PageNumber - 1,
+                    pageSize = showingSearchParametersDto.PageSize,
+                }),
+            ResourceUriType.NextPage => Url.Link("GetManyShowings",
+                new
+                {
+                    pageNumber = showingSearchParametersDto.PageNumber + 1,
+                    pageSize = showingSearchParametersDto.PageSize,
+                }),
+            _ => Url.Link("GetManyShowings",
+                new
+                {
+                    pageNumber = showingSearchParametersDto.PageNumber,
+                    pageSize = showingSearchParametersDto.PageSize,
+                })
+        };
+        return result;
     }
 }

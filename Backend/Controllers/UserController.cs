@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -36,10 +37,30 @@ public class UserController : ControllerBase
         return CreatedAtAction(nameof(Get), new{userId = user.Id}, userDTO);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetAll()
+    [HttpGet(Name = "GetManyUsers")]
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetMany([FromQuery] SearchParameters parameters)
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetManyAsync(parameters: parameters);
+
+        var previousPageLink = users.HasPrevious ?
+            CreateUsersResourceUri(parameters, ResourceUriType.PreviousPage) : null;
+
+        var nextPageLink = users.HasNext ?
+            CreateUsersResourceUri(parameters, ResourceUriType.NextPage) : null;
+
+        var paginationMetadata = new
+        {
+            totalCount = users.TotalCount,
+            pageSize = users.PageSize,
+            currentPage = users.CurrentPage,
+            totalPages = users.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        //200
         return Ok(users.Select(u => new UserDTO(
             u.Id,
             u.Username,
@@ -104,5 +125,33 @@ public class UserController : ControllerBase
     public static bool VerifyPassword(string plainPassword, string hashedPassword)
     {
         return BCrypt.Net.BCrypt.Verify(plainPassword, hashedPassword);
+    }
+
+    private string? CreateUsersResourceUri(
+        SearchParameters userSearchParametersDto,
+        ResourceUriType type)
+    {
+        var result = type switch
+        {
+            ResourceUriType.PreviousPage => Url.Link("GetManyUsers",
+                new
+                {
+                    pageNumber = userSearchParametersDto.PageNumber - 1,
+                    pageSize = userSearchParametersDto.PageSize,
+                }),
+            ResourceUriType.NextPage => Url.Link("GetManyUsers",
+                new
+                {
+                    pageNumber = userSearchParametersDto.PageNumber + 1,
+                    pageSize = userSearchParametersDto.PageSize,
+                }),
+            _ => Url.Link("GetManyUsers",
+                new
+                {
+                    pageNumber = userSearchParametersDto.PageNumber,
+                    pageSize = userSearchParametersDto.PageSize,
+                })
+        };
+        return result;
     }
 }

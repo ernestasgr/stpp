@@ -1,3 +1,4 @@
+using backend.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
@@ -19,6 +20,12 @@ public class MovieRepository : IRepository<Movie>
     public async Task<IReadOnlyList<Movie>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
     {
         return await _apiDbContext.Movies.ToListAsync();
+    }
+
+    public async Task<PagedList<Movie>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1, SearchParameters parameters = null!)
+    {
+        var queryable = _apiDbContext.Movies.AsQueryable().OrderBy(m => m.Title);
+        return await PagedList<Movie>.CreateAsync(queryable, parameters.PageNumber, parameters.PageSize);
     }
 
     public async Task<Movie?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)

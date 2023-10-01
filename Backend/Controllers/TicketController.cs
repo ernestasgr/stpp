@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,10 +61,30 @@ public class TicketController : ControllerBase
             new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType));
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<TicketDTO>>> GetAll(int movieId = -1, int showingId = -1)
+    [HttpGet(Name = "GetManyTickets")]
+    public async Task<ActionResult<IEnumerable<TicketDTO>>> GetMany([FromQuery] SearchParameters parameters, int movieId = -1, int showingId = -1)
     {
-        var tickets = await _ticketRepository.GetAllAsync(movieId, showingId);
+        var tickets = await _ticketRepository.GetManyAsync(movieId, showingId, parameters: parameters);
+
+        var previousPageLink = tickets.HasPrevious ?
+            CreateTicketsResourceUri(parameters, ResourceUriType.PreviousPage) : null;
+
+        var nextPageLink = tickets.HasNext ?
+            CreateTicketsResourceUri(parameters, ResourceUriType.NextPage) : null;
+
+        var paginationMetadata = new
+        {
+            totalCount = tickets.TotalCount,
+            pageSize = tickets.PageSize,
+            currentPage = tickets.CurrentPage,
+            totalPages = tickets.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        //200
         return Ok(tickets.Select(s => new TicketDTO(
             s.Id,
             s.Price,
@@ -121,5 +142,33 @@ public class TicketController : ControllerBase
         await _ticketRepository.RemoveAsync(ticket);
 
         return NoContent();
+    }
+
+    private string? CreateTicketsResourceUri(
+        SearchParameters ticketSearchParametersDto,
+        ResourceUriType type)
+    {
+        var result = type switch
+        {
+            ResourceUriType.PreviousPage => Url.Link("GetManyTickets",
+                new
+                {
+                    pageNumber = ticketSearchParametersDto.PageNumber - 1,
+                    pageSize = ticketSearchParametersDto.PageSize,
+                }),
+            ResourceUriType.NextPage => Url.Link("GetManyTickets",
+                new
+                {
+                    pageNumber = ticketSearchParametersDto.PageNumber + 1,
+                    pageSize = ticketSearchParametersDto.PageSize,
+                }),
+            _ => Url.Link("GetManyTickets",
+                new
+                {
+                    pageNumber = ticketSearchParametersDto.PageNumber,
+                    pageSize = ticketSearchParametersDto.PageSize,
+                })
+        };
+        return result;
     }
 }

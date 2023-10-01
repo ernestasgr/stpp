@@ -1,4 +1,4 @@
-using System.Runtime.Intrinsics.X86;
+using backend.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data;
@@ -32,6 +32,27 @@ public class TicketRepository : IRepository<Ticket>
                 t.MovieId == movieId).ToListAsync();
         }
         return await _apiDbContext.Tickets.ToListAsync();
+    }
+
+    public async Task<PagedList<Ticket>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1, SearchParameters parameters = null!)
+    {
+        IOrderedQueryable<Ticket> queryable;
+        if(movieId >= 0 && showingId == -1)
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().Where(
+                t => t.MovieId == movieId).OrderBy(t => t.ShowingNumber);
+        }
+        else if(showingId >= 0)
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().Where(
+                t => t.ShowingNumber == showingId && 
+                t.MovieId == movieId).OrderBy(t => t.Id);
+        }
+        else
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().OrderBy(t => t.MovieId).ThenBy(t => t.ShowingNumber);
+        }
+        return await PagedList<Ticket>.CreateAsync(queryable, parameters.PageNumber, parameters.PageSize);
     }
 
     public async Task<Ticket?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)

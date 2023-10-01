@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +19,7 @@ public class MovieController : ControllerBase
     {
         if(movieDTO.ReleaseDate.Kind != DateTimeKind.Utc)
         {
+            //400
             return BadRequest("Release date must match the UTC format");
         }
 
@@ -32,13 +33,34 @@ public class MovieController : ControllerBase
 
         await _movieRepository.CreateAsync(movie);
 
+        //201
         return CreatedAtAction(nameof(Get), new{movieId = movie.Id}, movieDTO);
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<MovieDTO>>> GetAll()
+    [HttpGet(Name = "GetMany")]
+    public async Task<ActionResult<IEnumerable<MovieDTO>>> GetMany([FromQuery] SearchParameters parameters)
     {
-        var movies = await _movieRepository.GetAllAsync();
+        var movies = await _movieRepository.GetManyAsync(parameters: parameters);
+
+        var previousPageLink = movies.HasPrevious ?
+            CreateMoviesResourceUri(parameters, ResourceUriType.PreviousPage) : null;
+
+        var nextPageLink = movies.HasNext ?
+            CreateMoviesResourceUri(parameters, ResourceUriType.NextPage) : null;
+
+        var paginationMetadata = new
+        {
+            totalCount = movies.TotalCount,
+            pageSize = movies.PageSize,
+            currentPage = movies.CurrentPage,
+            totalPages = movies.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        //200
         return Ok(movies.Select(m => new MovieDTO(
             m.Id,
             m.Title,
@@ -48,16 +70,18 @@ public class MovieController : ControllerBase
         )));
     }
 
-    [HttpGet("{movieId}")]
+    [HttpGet("{movieId}", Name="Get")]
     public async Task<ActionResult<MovieDTO>> Get(int movieId)
     {
         var movie = await _movieRepository.GetAsync(movieId);
 
         if(movie == null)
         {
+            //404
             return NotFound();
         }
 
+        //200
         return new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director);
     }
 
@@ -68,11 +92,13 @@ public class MovieController : ControllerBase
 
         if(movie == null)
         {
+            //404
             return NotFound();
         }
 
         if(movieDTO.ReleaseDate.Kind != DateTimeKind.Utc)
         {
+            //400
             return BadRequest("Release date must match the UTC format");
         }
 
@@ -83,21 +109,52 @@ public class MovieController : ControllerBase
 
         await _movieRepository.UpdateAsync(movie);
 
+        //200
         return Ok(movieDTO);
     }
 
-    [HttpDelete("{movieId}")]
+    [HttpDelete("{movieId}", Name="Remove")]
     public async Task<ActionResult> Remove(int movieId)
     {
         var movie = await _movieRepository.GetAsync(movieId);
 
         if(movie == null)
         {
+            //404
             return NotFound();
         }
 
         await _movieRepository.RemoveAsync(movie);
 
+        //204
         return NoContent();
+    }
+
+    private string? CreateMoviesResourceUri(
+        SearchParameters movieSearchParametersDto,
+        ResourceUriType type)
+    {
+        var result = type switch
+        {
+            ResourceUriType.PreviousPage => Url.Link("GetMany",
+                new
+                {
+                    pageNumber = movieSearchParametersDto.PageNumber - 1,
+                    pageSize = movieSearchParametersDto.PageSize,
+                }),
+            ResourceUriType.NextPage => Url.Link("GetMany",
+                new
+                {
+                    pageNumber = movieSearchParametersDto.PageNumber + 1,
+                    pageSize = movieSearchParametersDto.PageSize,
+                }),
+            _ => Url.Link("GetMany",
+                new
+                {
+                    pageNumber = movieSearchParametersDto.PageNumber,
+                    pageSize = movieSearchParametersDto.PageSize,
+                })
+        };
+        return result;
     }
 }
