@@ -16,12 +16,12 @@ public class MovieRepository : IRepository<Movie>
         await _apiDbContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Movie>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
+    public async Task<IReadOnlyList<Movie>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
     {
         return await _apiDbContext.Movies.ToListAsync();
     }
 
-    public async Task<Movie?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
+    public async Task<Movie?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
     {
         return await _apiDbContext.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
     }

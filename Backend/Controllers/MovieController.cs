@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using backend.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,16 +17,22 @@ public class MovieController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<MovieDTO>> Create([FromBody] MovieCreateDTO movieDTO)
     {
+        if(movieDTO.ReleaseDate.Kind != DateTimeKind.Utc)
+        {
+            return BadRequest("Release date must match the UTC format");
+        }
+
         var movie = new Movie
         {
             Title = movieDTO.Title,
             Description = movieDTO.Description,
-            ReleaseDate = movieDTO.ReleaseDate
+            ReleaseDate = movieDTO.ReleaseDate,
+            Director = movieDTO.Director
         };
 
         await _movieRepository.CreateAsync(movie);
 
-        return CreatedAtAction(nameof(Get), new{movieId = movie.Id}, movie);
+        return CreatedAtAction(nameof(Get), new{movieId = movie.Id}, movieDTO);
     }
 
     [HttpGet]
@@ -36,7 +43,8 @@ public class MovieController : ControllerBase
             m.Id,
             m.Title,
             m.Description,
-            m.ReleaseDate
+            m.ReleaseDate,
+            m.Director
         )));
     }
 
@@ -50,11 +58,11 @@ public class MovieController : ControllerBase
             return NotFound();
         }
 
-        return new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate);
+        return new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director);
     }
 
     [HttpPut("{movieId}")]
-    public async Task<ActionResult<Movie>> Update(int movieId, [FromBody] MovieCreateDTO movieDTO)
+    public async Task<ActionResult<MovieDTO>> Update(int movieId, [FromBody] MovieCreateDTO movieDTO)
     {
         var movie = await _movieRepository.GetAsync(movieId);
 
@@ -63,9 +71,15 @@ public class MovieController : ControllerBase
             return NotFound();
         }
 
+        if(movieDTO.ReleaseDate.Kind != DateTimeKind.Utc)
+        {
+            return BadRequest("Release date must match the UTC format");
+        }
+
         movie.Title = movieDTO.Title;
         movie.Description = movieDTO.Description;
         movie.ReleaseDate = movieDTO.ReleaseDate;
+        movie.Director = movieDTO.Director;
 
         await _movieRepository.UpdateAsync(movie);
 

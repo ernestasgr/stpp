@@ -14,6 +14,8 @@ builder.Services
 
 builder.Services.AddTransient<IRepository<Movie>, MovieRepository>();
 builder.Services.AddTransient<IRepository<Showing>, ShowingRepository>();
+builder.Services.AddTransient<IRepository<Ticket>, TicketRepository>();
+builder.Services.AddTransient<IRepository<User>, UserRepository>();
 
 var app = builder.Build();
 

@@ -16,7 +16,7 @@ public class ShowingRepository : IRepository<Showing>
         await _apiDbContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Showing>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
+    public async Task<IReadOnlyList<Showing>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
     {
         if(movieId >= 0)
         {
@@ -25,7 +25,7 @@ public class ShowingRepository : IRepository<Showing>
         return await _apiDbContext.Showings.ToListAsync();
     }
 
-    public async Task<Showing?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
+    public async Task<Showing?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
     {
         return await _apiDbContext.Showings.Where(s => s.Number == showingId && s.MovieId == movieId).FirstOrDefaultAsync();
     }
