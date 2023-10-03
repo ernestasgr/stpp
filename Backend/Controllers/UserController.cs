@@ -95,7 +95,7 @@ public class UserController : ControllerBase
 
         await _userRepository.UpdateAsync(user);
 
-        return Ok(userDTO);
+        return Ok(new UserDTO(user.Id, user.Username, user.Email));
     }
 
     [HttpDelete("{userId}")]

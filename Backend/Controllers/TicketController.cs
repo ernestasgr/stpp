@@ -121,7 +121,7 @@ public class TicketController : ControllerBase
 
         await _ticketRepository.UpdateAsync(ticket);
 
-        return Ok(ticketDTO);
+        return Ok(new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType));
     }
 
     [HttpDelete("{ticketId}")]
@@ -134,7 +134,9 @@ public class TicketController : ControllerBase
             return NotFound();
         }
 
-        if(ticket.Showing.StartTime < DateTime.Now)
+        var showing = await _showingRepository.GetAsync(movieId, showingId);
+
+        if(showing!.StartTime < DateTime.Now)
         {
             return BadRequest("Can't refund a ticket for a showing that has already started");
         }

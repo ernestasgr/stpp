@@ -34,7 +34,8 @@ public class MovieController : ControllerBase
         await _movieRepository.CreateAsync(movie);
 
         //201
-        return CreatedAtAction(nameof(Get), new{movieId = movie.Id}, movieDTO);
+        return CreatedAtAction(nameof(Get), new{movieId = movie.Id},
+            new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director));
     }
 
     [HttpGet(Name = "GetMany")]
@@ -110,7 +111,7 @@ public class MovieController : ControllerBase
         await _movieRepository.UpdateAsync(movie);
 
         //200
-        return Ok(movieDTO);
+        return Ok(new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director));
     }
 
     [HttpDelete("{movieId}", Name="Remove")]

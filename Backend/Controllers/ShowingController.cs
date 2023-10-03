@@ -137,7 +137,7 @@ public class ShowingController : ControllerBase
 
         await _showingRepository.UpdateAsync(showing);
 
-        return Ok(showingDTO);
+        return Ok(new ShowingDTO(showingId, showing.StartTime, showing.EndTime, movieId));
     }
 
     [HttpDelete("{showingId}")]
