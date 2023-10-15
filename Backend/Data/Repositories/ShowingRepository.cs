@@ -17,7 +17,7 @@ public class ShowingRepository : IRepository<Showing>
         await _apiDbContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Showing>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
+    public async Task<IReadOnlyList<Showing>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
     {
         if(movieId >= 0)
         {
@@ -26,7 +26,7 @@ public class ShowingRepository : IRepository<Showing>
         return await _apiDbContext.Showings.ToListAsync();
     }
 
-    public async Task<PagedList<Showing>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1, SearchParameters parameters = null!)
+    public async Task<PagedList<Showing>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, SearchParameters parameters = null!)
     {
         IOrderedQueryable<Showing> queryable;
         if(movieId >= 0)
@@ -40,7 +40,7 @@ public class ShowingRepository : IRepository<Showing>
         return await PagedList<Showing>.CreateAsync(queryable, parameters.PageNumber, parameters.PageSize);
     }
 
-    public async Task<Showing?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
+    public async Task<Showing?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
     {
         return await _apiDbContext.Showings.Where(s => s.Number == showingId && s.MovieId == movieId).FirstOrDefaultAsync();
     }

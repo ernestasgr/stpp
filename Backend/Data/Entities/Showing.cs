@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace backend.Data;
 
 public class Showing
@@ -8,17 +10,22 @@ public class Showing
     public Movie Movie { get; set; }
     public int Number { get; set; }
     public List<Ticket> Tickets { get; set; }
-    public Showing(DateTime startTime, DateTime endTime, int movieId, Movie movie)
+    [Required]
+    public string UserId { get; set; }
+    public User User { get; set; } = null!;
+    public Showing(DateTime startTime, DateTime endTime, int movieId, Movie movie, string userId)
     {
         StartTime = startTime;
         EndTime = endTime;
         MovieId = movieId;
         Movie = movie;
         Tickets = new List<Ticket>();
+        UserId = userId;
     }
     public Showing()
     {
         Movie = null!;
         Tickets = new List<Ticket>();
+        UserId = "";
     }
 }

@@ -1,5 +1,9 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using backend.Data;
+using backend.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -11,14 +15,18 @@ public class TicketController : ControllerBase
     private readonly IRepository<Ticket> _ticketRepository;
     private readonly IRepository<Showing> _showingRepository;
     private readonly IRepository<Movie> _movieRepository;
-    public TicketController(IRepository<Ticket> ticketRepository, IRepository<Showing> showingRepository, IRepository<Movie> movieRepository)
+    private readonly IAuthorizationService _authorizationService;
+
+    public TicketController(IRepository<Ticket> ticketRepository, IRepository<Showing> showingRepository, IRepository<Movie> movieRepository, IAuthorizationService authorizationService)
     {
         _ticketRepository = ticketRepository;
         _showingRepository = showingRepository;
         _movieRepository = movieRepository;
+        _authorizationService = authorizationService;
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Viewer)]
     public async Task<ActionResult<TicketDTO>> Create(int movieId, int showingId, [FromBody] TicketCreateDTO ticketDTO)
     {
         var movie = await _movieRepository.GetAsync(movieId);
@@ -50,7 +58,8 @@ public class TicketController : ControllerBase
             Showing = showing,
             ShowingNumber = showingId,
             MovieId = movieId,
-            TicketType = ticketDTO.TicketType
+            TicketType = ticketDTO.TicketType,
+            UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
         };
 
         await _ticketRepository.CreateAsync(ticket);
@@ -62,9 +71,19 @@ public class TicketController : ControllerBase
     }
 
     [HttpGet(Name = "GetManyTickets")]
+    [Authorize(Roles = UserRoles.Viewer)]
     public async Task<ActionResult<IEnumerable<TicketDTO>>> GetMany([FromQuery] SearchParameters parameters, int movieId = -1, int showingId = -1)
     {
-        var tickets = await _ticketRepository.GetManyAsync(movieId, showingId, parameters: parameters);
+        PagedList<Ticket> tickets;
+
+        if(!User.IsInRole(UserRoles.Admin))
+        {
+            tickets = await (_ticketRepository as TicketRepository)!.GetManyForUserAsync(movieId, showingId, userId: User.FindFirstValue(JwtRegisteredClaimNames.Sub), parameters: parameters);
+        }
+        else
+        {
+            tickets = await _ticketRepository.GetManyAsync(movieId, showingId, parameters: parameters);
+        }
 
         var previousPageLink = tickets.HasPrevious ?
             CreateTicketsResourceUri(parameters, ResourceUriType.PreviousPage) : null;
@@ -95,6 +114,7 @@ public class TicketController : ControllerBase
     }
 
     [HttpGet("{ticketId}")]
+    [Authorize(Roles = UserRoles.Viewer)]
     public async Task<ActionResult<TicketDTO>> Get(int movieId, int showingId, int ticketId)
     {
         var ticket = await _ticketRepository.GetAsync(movieId, showingId, ticketId);
@@ -104,10 +124,17 @@ public class TicketController : ControllerBase
             return NotFound();
         }
 
+        var authorrizationResult = await _authorizationService.AuthorizeAsync(User, ticket, PolicyNames.ResourceOwner);
+        if(!authorrizationResult.Succeeded)
+        {
+            return Forbid();
+        }
+
         return new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType);
     }
 
     [HttpPut("{ticketId}")]
+    [Authorize(Roles = UserRoles.Viewer)]
     public async Task<ActionResult<TicketDTO>> Update(int movieId, int showingId, int ticketId, [FromBody] TicketUpdateDTO ticketDTO)
     {
         var ticket = await _ticketRepository.GetAsync(movieId, showingId, ticketId);
@@ -115,6 +142,12 @@ public class TicketController : ControllerBase
         if(ticket == null)
         {
             return NotFound();
+        }
+
+        var authorrizationResult = await _authorizationService.AuthorizeAsync(User, ticket, PolicyNames.ResourceOwner);
+        if(!authorrizationResult.Succeeded)
+        {
+            return Forbid();
         }
 
         ticket.TicketType = ticketDTO.TicketType;
@@ -125,6 +158,7 @@ public class TicketController : ControllerBase
     }
 
     [HttpDelete("{ticketId}")]
+    [Authorize(Roles = UserRoles.Viewer)]
     public async Task<ActionResult> Remove(int movieId, int showingId, int ticketId)
     {
         var ticket = await _ticketRepository.GetAsync(movieId, showingId, ticketId);
@@ -132,6 +166,12 @@ public class TicketController : ControllerBase
         if(ticket == null)
         {
             return NotFound();
+        }
+
+        var authorrizationResult = await _authorizationService.AuthorizeAsync(User, ticket, PolicyNames.ResourceOwner);
+        if(!authorrizationResult.Succeeded)
+        {
+            return Forbid();
         }
 
         var showing = await _showingRepository.GetAsync(movieId, showingId);

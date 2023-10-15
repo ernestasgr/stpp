@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace backend.Data;
 
 public class Movie
@@ -8,7 +10,10 @@ public class Movie
     public string Director { get; set; }
     public DateTime ReleaseDate { get; set; }
     public List<Showing> Showings { get; set; }
-    public Movie(int id, string title, string description, DateTime releaseDate, string director)
+    [Required]
+    public string UserId { get; set; }
+    public User User { get; set; } = null!;
+    public Movie(int id, string title, string description, DateTime releaseDate, string director, string userId)
     {
         Id = id;
         Title = title;
@@ -16,6 +21,7 @@ public class Movie
         ReleaseDate = releaseDate;
         Showings = new List<Showing>();
         Director = director;
+        UserId = userId;
     }
     public Movie()
     {
@@ -23,5 +29,6 @@ public class Movie
         Description = "";
         Director = "";
         Showings = new List<Showing>();
+        UserId = "";
     }
 }

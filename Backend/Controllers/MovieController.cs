@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using backend.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -15,6 +18,7 @@ public class MovieController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<MovieDTO>> Create([FromBody] MovieCreateDTO movieDTO)
     {
         if(movieDTO.ReleaseDate.Kind != DateTimeKind.Utc)
@@ -28,7 +32,8 @@ public class MovieController : ControllerBase
             Title = movieDTO.Title,
             Description = movieDTO.Description,
             ReleaseDate = movieDTO.ReleaseDate,
-            Director = movieDTO.Director
+            Director = movieDTO.Director,
+            UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
         };
 
         await _movieRepository.CreateAsync(movie);
@@ -87,6 +92,7 @@ public class MovieController : ControllerBase
     }
 
     [HttpPut("{movieId}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<MovieDTO>> Update(int movieId, [FromBody] MovieCreateDTO movieDTO)
     {
         var movie = await _movieRepository.GetAsync(movieId);
@@ -115,6 +121,7 @@ public class MovieController : ControllerBase
     }
 
     [HttpDelete("{movieId}", Name="Remove")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult> Remove(int movieId)
     {
         var movie = await _movieRepository.GetAsync(movieId);

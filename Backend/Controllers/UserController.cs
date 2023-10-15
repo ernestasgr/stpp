@@ -1,157 +1,73 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using backend.Data;
+using backend.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
 
 [ApiController]
-[Route("api/v1/users")]
+[Route("api/v1")]
+[AllowAnonymous]
 public class UserController : ControllerBase
 {
-    private readonly IRepository<User> _userRepository;
-    public UserController(IRepository<User> userRepository)
+    private readonly UserManager<User> _userManager;
+    private readonly IJwtTokenService _jwtTokenService;
+
+    public UserController(UserManager<User> userManager, IJwtTokenService jwtTokenService)
     {
-        _userRepository = userRepository;
+        _userManager = userManager;
+        _jwtTokenService = jwtTokenService;
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserDTO>> Create([FromBody] UserCreateDTO userDTO)
+    [Route("register")]
+    public async Task<IActionResult> Register(RegisterUserDTO registerUserDTO)
     {
-        string pattern = @"^(?!\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-        if(!Regex.IsMatch(userDTO.Email, pattern))
+        var user = await _userManager.FindByNameAsync(registerUserDTO.Username);
+        if(user != null)
         {
-            return BadRequest("Email does not match a valid pattern");
+            return BadRequest("A user with that username already exists");
         }
 
-        var user = new User
+        var newUser = new User
         {
-            Username = userDTO.Username,
-            Email = userDTO.Email,
-            Password = HashPassword(userDTO.Password),
-            RegistrationDate = DateTime.Now.ToUniversalTime()
+            UserName = registerUserDTO.Username,
+            Email = registerUserDTO.Email
         };
 
-        await _userRepository.CreateAsync(user);
-
-        return CreatedAtAction(nameof(Get), new{userId = user.Id}, userDTO);
-    }
-
-    [HttpGet(Name = "GetManyUsers")]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetMany([FromQuery] SearchParameters parameters)
-    {
-        var users = await _userRepository.GetManyAsync(parameters: parameters);
-
-        var previousPageLink = users.HasPrevious ?
-            CreateUsersResourceUri(parameters, ResourceUriType.PreviousPage) : null;
-
-        var nextPageLink = users.HasNext ?
-            CreateUsersResourceUri(parameters, ResourceUriType.NextPage) : null;
-
-        var paginationMetadata = new
+        var createUserResult = await _userManager.CreateAsync(newUser, registerUserDTO.Password);
+        if(!createUserResult.Succeeded)
         {
-            totalCount = users.TotalCount,
-            pageSize = users.PageSize,
-            currentPage = users.CurrentPage,
-            totalPages = users.TotalPages,
-            previousPageLink,
-            nextPageLink
-        };
-
-        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
-
-        //200
-        return Ok(users.Select(u => new UserDTO(
-            u.Id,
-            u.Username,
-            u.Email
-        )));
-    }
-
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<UserDTO>> Get(int userId)
-    {
-        var user = await _userRepository.GetAsync(userId: userId);
-
-        if(user == null)
-        {
-            return NotFound();
+            return BadRequest("Could not create a user");
         }
 
-        return new UserDTO(user.Id, user.Username, user.Email);
+        await _userManager.AddToRoleAsync(newUser, UserRoles.Viewer);
+
+        return CreatedAtAction(nameof(Register), new UserDTO(newUser.Id, newUser.UserName, newUser.Email));
     }
 
-    [HttpPut("{userId}")]
-    public async Task<ActionResult<UserDTO>> Update(int userId, [FromBody] UserUpdateDTO userDTO)
+    [HttpPost]
+    [Route("login")]
+    public async Task<IActionResult> Login(LoginUserDTO loginUserDTO)
     {
-        var user = await _userRepository.GetAsync(userId: userId);
-
+        var user = await _userManager.FindByNameAsync(loginUserDTO.Username);
         if(user == null)
         {
-            return NotFound();
+            return BadRequest("A user with that username or password does not exist");
         }
 
-        user.Password = HashPassword(userDTO.Password);
-
-        await _userRepository.UpdateAsync(user);
-
-        return Ok(new UserDTO(user.Id, user.Username, user.Email));
-    }
-
-    [HttpDelete("{userId}")]
-    public async Task<ActionResult> Remove(int userId)
-    {
-        var user = await _userRepository.GetAsync(userId: userId);
-
-        if(user == null)
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginUserDTO.Password);
+        if(!isPasswordValid)
         {
-            return NotFound();
+            return BadRequest("A user with that username or password does not exist");
         }
 
-        await _userRepository.RemoveAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var accessToken = _jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
 
-        return NoContent();
-    }
-
-    public static string HashPassword(string plainPassword)
-    {
-        string salt = BCrypt.Net.BCrypt.GenerateSalt(12); 
-
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword, salt);
-
-        return hashedPassword;
-    }
-
-    public static bool VerifyPassword(string plainPassword, string hashedPassword)
-    {
-        return BCrypt.Net.BCrypt.Verify(plainPassword, hashedPassword);
-    }
-
-    private string? CreateUsersResourceUri(
-        SearchParameters userSearchParametersDto,
-        ResourceUriType type)
-    {
-        var result = type switch
-        {
-            ResourceUriType.PreviousPage => Url.Link("GetManyUsers",
-                new
-                {
-                    pageNumber = userSearchParametersDto.PageNumber - 1,
-                    pageSize = userSearchParametersDto.PageSize,
-                }),
-            ResourceUriType.NextPage => Url.Link("GetManyUsers",
-                new
-                {
-                    pageNumber = userSearchParametersDto.PageNumber + 1,
-                    pageSize = userSearchParametersDto.PageSize,
-                }),
-            _ => Url.Link("GetManyUsers",
-                new
-                {
-                    pageNumber = userSearchParametersDto.PageNumber,
-                    pageSize = userSearchParametersDto.PageSize,
-                })
-        };
-        return result;
+        return Ok(new SuccessfulLoginDTO(accessToken));
     }
 }

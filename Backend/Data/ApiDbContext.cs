@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Data;
 
-public class ApiDbContext : DbContext
+public class ApiDbContext : IdentityDbContext<User>
 {
     public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
     {
@@ -10,7 +11,7 @@ public class ApiDbContext : DbContext
     public DbSet<Movie> Movies { get; set; } = null!;
     public DbSet<Showing> Showings { get; set; } = null!;
     public DbSet<Ticket> Tickets { get; set; } = null!;
-    public DbSet<User> Users { get; set; } = null!;
+    //public DbSet<User> Users { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

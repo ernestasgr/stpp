@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using backend.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -17,6 +20,7 @@ public class ShowingController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<ShowingDTO>> Create(int movieId, [FromBody] ShowingCreateDTO showingDTO)
     {
         var movie = await _movieRepository.GetAsync(movieId);
@@ -53,7 +57,8 @@ public class ShowingController : ControllerBase
             StartTime = showingDTO.StartTime,
             EndTime = showingDTO.EndTime,
             MovieId = movieId,
-            Movie = movie
+            Movie = movie,
+            UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
         };
 
         await _showingRepository.CreateAsync(showing);
@@ -110,6 +115,7 @@ public class ShowingController : ControllerBase
     }
 
     [HttpPut("{showingId}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<ShowingDTO>> Update(int movieId, int showingId, [FromBody] ShowingCreateDTO showingDTO)
     {
         var showing = await _showingRepository.GetAsync(movieId, showingId);
@@ -141,6 +147,7 @@ public class ShowingController : ControllerBase
     }
 
     [HttpDelete("{showingId}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult> Remove(int movieId, int showingId)
     {
         var showing = await _showingRepository.GetAsync(movieId, showingId);

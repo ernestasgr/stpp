@@ -17,7 +17,7 @@ public class TicketRepository : IRepository<Ticket>
         await _apiDbContext.SaveChangesAsync();
     }
 
-    public async Task<IReadOnlyList<Ticket>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
+    public async Task<IReadOnlyList<Ticket>> GetAllAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
     {
         if(movieId >= 0 && showingId == -1)
         {
@@ -34,7 +34,7 @@ public class TicketRepository : IRepository<Ticket>
         return await _apiDbContext.Tickets.ToListAsync();
     }
 
-    public async Task<PagedList<Ticket>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1, SearchParameters parameters = null!)
+    public async Task<PagedList<Ticket>> GetManyAsync(int movieId = -1, int showingId = -1, int ticketId = -1, SearchParameters parameters = null!)
     {
         IOrderedQueryable<Ticket> queryable;
         if(movieId >= 0 && showingId == -1)
@@ -55,7 +55,29 @@ public class TicketRepository : IRepository<Ticket>
         return await PagedList<Ticket>.CreateAsync(queryable, parameters.PageNumber, parameters.PageSize);
     }
 
-    public async Task<Ticket?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1, int userId = -1)
+    public async Task<PagedList<Ticket>> GetManyForUserAsync(int movieId = -1, int showingId = -1, int ticketId = -1, string userId = "", SearchParameters parameters = null!)
+    {
+        IOrderedQueryable<Ticket> queryable;
+        if(movieId >= 0 && showingId == -1)
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().Where(
+                t => t.MovieId == movieId).OrderBy(t => t.ShowingNumber);
+        }
+        else if(showingId >= 0)
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().Where(
+                t => t.ShowingNumber == showingId && 
+                t.MovieId == movieId).OrderBy(t => t.Id);
+        }
+        else
+        {
+            queryable = _apiDbContext.Tickets.AsQueryable().OrderBy(t => t.MovieId).ThenBy(t => t.ShowingNumber);
+        }
+        queryable = queryable.Where(t => t.UserId == userId).OrderBy(t => t.MovieId).ThenBy(t => t.ShowingNumber);
+        return await PagedList<Ticket>.CreateAsync(queryable, parameters.PageNumber, parameters.PageSize);
+    }
+
+    public async Task<Ticket?> GetAsync(int movieId = -1, int showingId = -1, int ticketId = -1)
     {
         return await _apiDbContext.Tickets.Where(
             t => t.Id == ticketId && 
