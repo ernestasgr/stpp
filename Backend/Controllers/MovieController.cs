@@ -33,14 +33,17 @@ public class MovieController : ControllerBase
             Description = movieDTO.Description,
             ReleaseDate = movieDTO.ReleaseDate,
             Director = movieDTO.Director,
-            UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub),
+            MainImage = movieDTO.MainImage,
+            Images = movieDTO.Images,
+            Videos = movieDTO.Videos
         };
 
         await _movieRepository.CreateAsync(movie);
 
         //201
         return CreatedAtAction(nameof(Get), new{movieId = movie.Id},
-            new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director));
+            new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director, movie.MainImage, movie.Images, movie.Videos));
     }
 
     [HttpGet(Name = "GetMany")]
@@ -72,7 +75,10 @@ public class MovieController : ControllerBase
             m.Title,
             m.Description,
             m.ReleaseDate,
-            m.Director
+            m.Director,
+            m.MainImage,
+            m.Images,
+            m.Videos
         )));
     }
 
@@ -88,7 +94,7 @@ public class MovieController : ControllerBase
         }
 
         //200
-        return new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director);
+        return new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director, movie.MainImage, movie.Images, movie.Videos);
     }
 
     [HttpPut("{movieId}")]
@@ -113,11 +119,14 @@ public class MovieController : ControllerBase
         movie.Description = movieDTO.Description;
         movie.ReleaseDate = movieDTO.ReleaseDate;
         movie.Director = movieDTO.Director;
+        movie.MainImage = movieDTO.MainImage;
+        movie.Images = movieDTO.Images;
+        movie.Videos = movieDTO.Videos;
 
         await _movieRepository.UpdateAsync(movie);
 
         //200
-        return Ok(new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director));
+        return Ok(new MovieDTO(movie.Id, movie.Title, movie.Description, movie.ReleaseDate, movie.Director, movie.MainImage, movie.Images, movie.Videos));
     }
 
     [HttpDelete("{movieId}", Name="Remove")]

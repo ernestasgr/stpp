@@ -54,6 +54,10 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
 
 var app = builder.Build();
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());   
 
 if (app.Environment.IsDevelopment())
 {
@@ -65,6 +69,8 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
+
 
 var dbSeeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<UserDbSeeder>();
 await dbSeeder.SeedAsync();

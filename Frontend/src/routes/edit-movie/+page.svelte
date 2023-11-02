@@ -1,0 +1,256 @@
+<script lang="ts">
+	import { onMount } from "svelte";
+	import { accessToken } from "../../stores";
+
+    $: movieEdit = {
+      id: 0,
+      title: "",
+      description: "",
+      releaseDate: "",
+      director: "",
+      mainImage: "",
+      images: [""] as string[],
+      videos: [""] as string[],
+    };
+
+    let movies: any[] = [];
+
+    let editResult: string;
+    let editSuccessful = false;
+
+    let accessTokenValue: string;
+    
+    accessToken.subscribe((value => {
+        accessTokenValue = value;
+    }))
+  
+    function addImage() {
+        movieEdit.images = [...movieEdit.images, ""];
+    }
+  
+    /**
+	 * @param {number} index
+	 */
+    function removeImage(index: number) {
+        movieEdit.images = movieEdit.images.filter((_, i) => i !== index);
+    }
+  
+    function addVideo() {
+        movieEdit.videos = [...movieEdit.videos, ""];
+    }
+  
+    /**
+	 * @param {number} index
+	 */
+    function removeVideo(index: number) {
+        movieEdit.videos = movieEdit.videos.filter((_, i) => i !== index);
+    }
+  
+    function editMovie() {
+        let data = {
+            title: movieEdit.title,
+            description: movieEdit.description,
+            releaseDate: movieEdit.releaseDate + "T12:00:00Z",
+            director: movieEdit.director,
+            mainImage: movieEdit.mainImage,
+            images: movieEdit.images,
+            videos: movieEdit.videos,
+        }
+
+        fetch(`http://localhost:5157/api/v1/movies/${movieEdit.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessTokenValue}`
+            },
+            body: JSON.stringify(data)
+        })
+        .then(async response => {
+            console.log(response);
+            if(!response.ok) {
+                editResult = await response.text();
+                console.log(editResult);
+                editSuccessful = false;
+                throw editResult;
+            } else {
+                return response.json();
+            }
+        })
+        .then(response => {
+            editResult = 'Movie edited successfully!';
+            editSuccessful = true;
+            console.log(response);
+        })
+        .catch((error) => console.error('Error editing movie', error));
+    }
+
+    onMount(() => {
+        fetch('http://localhost:5157/api/v1/movies?PageNumber=1&PageSize=50', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(async response => {
+            console.log(response);
+            if(!response.ok) {
+                throw await response.text();
+            } else {
+                return response.json();
+            }
+        })
+        .then(response => {
+			movies = response;
+            console.log(movies);
+        })
+        .then(() => {
+            fetch(`http://localhost:5157/api/v1/movies/${movies[0].id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(async response => {
+                console.log(response);
+                if(!response.ok) {
+                    throw await response.text();
+                } else {
+                    return response.json();
+                }
+            })
+            .then(response => {
+                movieEdit = response;
+                movieEdit.releaseDate = response.releaseDate.split("T")[0];
+                console.log(movieEdit);
+            })
+            .catch((error) => console.error('Error fetching movie', error));
+        })
+        .catch((error) => console.error('Error fetching movies', error));
+
+        
+    })
+  
+
+	function handleSelectChange(event: Event) {
+        if(event.target !== null) {
+            fetch(`http://localhost:5157/api/v1/movies/${(event.target as HTMLInputElement).value}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(async response => {
+                console.log(response);
+                if(!response.ok) {
+                    throw await response.text();
+                } else {
+                    return response.json();
+                }
+            })
+            .then(response => {
+                movieEdit = response;
+                movieEdit.releaseDate = response.releaseDate.split("T")[0];
+                console.log(movieEdit);
+            })
+            .catch((error) => console.error('Error fetching movie', error));
+        }
+        
+	}
+
+
+	function deleteMovie(id: number) {
+        console.log("DELETE");
+        fetch(`http://localhost:5157/api/v1/movies/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessTokenValue}`
+            },
+        })
+        .then(async response => {
+            console.log(response);
+            if(!response.ok) {
+                throw await response.text();
+            } else {
+                const index = movies.findIndex(movie => movie.id === movieEdit.id);
+                if (index !== -1) {
+                    movies = movies.filter((_, i) => i !== index);
+                    console.log('Movie deleted from array');
+                    console.log(movies)
+                    movieEdit = movies[0];
+                    movieEdit.releaseDate = movies[0].releaseDate.split("T")[0];
+                }
+            }
+        })
+        .catch((error) => console.error('Error deleting movie', error));
+    }
+</script>
+
+  <select class="select" on:change={handleSelectChange}>
+    {#each movies as movie}
+        <option value={movie.id}>{movie.title}</option>
+    {/each}
+  </select>
+  
+  <main class="p-4">
+    <h1 class="text-3xl font-semibold mb-4">Edit Movie Information</h1>
+  
+    <form on:submit|preventDefault={editMovie}>
+      <div class="mb-4">
+        <label for="title" class="block text-sm font-medium mb-2">Title</label>
+        <input type="text" id="title" bind:value={movieEdit.title} class="input" />
+      </div>
+  
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium mb-2">Description</label>
+        <textarea id="description" bind:value={movieEdit.description} class="input" rows="4"></textarea>
+      </div>
+  
+      <div class="mb-4">
+        <label for="releaseDate" class="block text-sm font-medium mb-2">Release Date</label>
+        <input type="date" id="releaseDate" bind:value={movieEdit.releaseDate} class="input" />
+      </div>
+  
+      <div class="mb-4">
+        <label for="director" class="block text-sm font-medium mb-2">Director</label>
+        <input type="text" id="director" bind:value={movieEdit.director} class="input" />
+      </div>
+  
+      <div class="mb-4">
+        <label for="mainImage" class="block text-sm font-medium mb-2">Main Image</label>
+        <input type="url" bind:value={movieEdit.mainImage} class="input" />
+      </div>
+  
+      <div class="mb-4">
+        <label for="images" class="block text-sm font-medium mb-2">Images</label>
+        {#each movieEdit.images as image, index}
+          <div class="flex items-center mb-2">
+            <input type="url" bind:value={movieEdit.images[index]} class="input mr-2" />
+            <button type="button" on:click={() => removeImage(index)} class="text-red-500 hover:text-red-700">Remove</button>
+          </div>
+        {/each}
+        <button type="button" on:click={addImage} class="btn btn-sm variant-filled">Add Image</button>
+      </div>
+      
+      <div class="mb-4">
+        <label for="videos" class="block text-sm font-medium mb-2">Videos</label>
+        {#each movieEdit.videos as video, index}
+          <div class="flex items-center mb-2">
+            <input type="url" bind:value={movieEdit.videos[index]} class="input mr-2" />
+            <button type="button" on:click={() => removeVideo(index)} class="text-red-500 hover:text-red-700">Remove</button>
+          </div>
+        {/each}
+        <button type="button" on:click={addVideo} class="btn btn-sm variant-filled">Add Video</button>
+      </div>
+      <div class="flex">
+        <button type="submit" class="btn variant-filled">Edit Movie</button>
+        <button class="btn variant-filled-primary" on:click={(e) => {e.preventDefault(); deleteMovie(movieEdit.id)}}>Delete Movie</button>
+      </div>
+      
+    </form>
+  </main>
+
+{#if editResult}
+    <p>{editResult}</p>
+{/if}
+  
