@@ -228,6 +228,9 @@
             <input type="url" bind:value={movieEdit.images[index]} class="input mr-2" />
             <button type="button" on:click={() => removeImage(index)} class="text-red-500 hover:text-red-700">Remove</button>
           </div>
+          <div class="w-1/2 pl-2 h-auto max-h-[75vh] relative">
+            <img src={movieEdit.images[index]} alt={movieEdit.title} style="max-height: 100%; object-fit: contain;">
+          </div>          
         {/each}
         <button type="button" on:click={addImage} class="btn btn-sm variant-filled">Add Image</button>
       </div>
@@ -238,6 +241,17 @@
           <div class="flex items-center mb-2">
             <input type="url" bind:value={movieEdit.videos[index]} class="input mr-2" />
             <button type="button" on:click={() => removeVideo(index)} class="text-red-500 hover:text-red-700">Remove</button>
+          </div>
+          <div class="w-1/2 pl-2 h-auto max-h-[75vh] relative">
+            <div class="w-full h-0 pb-[56.25%] bg-black">
+                <iframe
+                    class="absolute inset-0 w-full h-full video-player"
+                    src={movieEdit.videos[index]}
+                    frameborder="0"
+                    allowfullscreen
+                    title="trailer"
+                ></iframe>
+            </div>
           </div>
         {/each}
         <button type="button" on:click={addVideo} class="btn btn-sm variant-filled">Add Video</button>
