@@ -44,7 +44,7 @@
 			<li><a href="/register" on:click={drawerClose}>Register</a></li>
 			<li><a href="/login" on:click={drawerClose}>Login</a></li>
 			{#if isAdmin}
-				<li><a href="/create-movie" on:click={drawerClose}>Create Movie</a></li>
+				<li ><a href="/create-movie" on:click={drawerClose}>Create Movie</a></li>
 				<li><a href="/edit-movie" on:click={drawerClose}>Edit Movie</a></li>
 			{/if}
 		</ul>
@@ -89,10 +89,10 @@
 							</svg>
 						</span>
 					</button>
-					<a href="/"><strong class="text-xl uppercase"><span style="color:#d4163c">Movie</span> Theatre</strong></a>
+					<a href="/"><strong class="text-xl uppercase"><span style="color:#d4163c">Movie</span> Theatre</strong> <i class="fa-solid fa-film text-xl mr-4" /></a>
 					{#if isAdmin}
 						<a
-						class="btn btn-sm variant-ghost-surface invisible md:visible"
+						class="btn btn-sm variant-ghost-surface invisible md:visible mr-2"
 						href="/create-movie"
 						>
 						Create Movie

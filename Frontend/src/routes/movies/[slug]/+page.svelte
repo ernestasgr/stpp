@@ -19,6 +19,13 @@
         videos: []
     };
 
+      $: showings = [
+        {
+            startTime: "2000-01-01T08:00:00Z",
+            endTime: "2000-01-02T08:00:00Z"
+        }
+      ];
+
     onMount(() => {
         fetch(`http://localhost:5157/api/v1/movies/${data.slug}`, {
             method: 'GET',
@@ -37,6 +44,24 @@
         .then(response => {
 			movie = response;
             console.log(movie);
+            return response;
+        })
+        .then(response => {
+            fetch(`http://localhost:5157/api/v1/movies/${data.slug}/showings?PageNumber=1&PageSize=50`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(async response => {
+                console.log(response);
+                if(!response.ok) {
+                    throw await response.text();
+                } else {
+                    showings = await response.json();
+                    return showings;
+                }
+            })
         })
         .catch((error) => console.error('Error fetching movie', error));
     })
@@ -66,7 +91,14 @@
                 : elemCarousel.scrollLeft + elemCarousel.clientWidth; // step right
         elemCarousel.scroll(x, 0);
     }
-					
+			
+    /**
+	 * @param {string} date
+	 */
+    function dateToUserFriendly(date) {
+        let splitDate = date.split("T");
+        return splitDate[0] + " " + splitDate[1].split(":")[0] + ":" + splitDate[1].split(":")[1];
+    }
 					
 </script>
 
@@ -149,5 +181,29 @@
             </div>
         {/each}
     </section>
+
+    <br/>
+    <strong class="uppercase text-l"><span style="color:#d4163c">Available</span> Showings:</strong>
+    <div class="table-container">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each showings as showing}
+                    <tr>
+                        <td>{dateToUserFriendly(showing.startTime)}</td>
+                        <td>{dateToUserFriendly(showing.endTime)}</td>
+                        <td>View</td>
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
+    
 
 </div>
