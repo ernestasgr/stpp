@@ -1,9 +1,9 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, AppBar, Avatar, AppRail, AppRailAnchor, TabGroup, TabAnchor } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, Avatar, Modal } from '@skeletonlabs/skeleton';
 	import { accessToken, isAdminStore, usernameStore } from '../stores';
 	import { initializeStores, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
-	import '@fortawesome/fontawesome-free/css/all.min.css'
+	import '@fortawesome/fontawesome-free/css/all.min.css';
 
 	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
@@ -14,15 +14,15 @@
 	let username: string;
 	let isAdmin: boolean;
 
-	accessToken.subscribe(value => {
+	accessToken.subscribe((value) => {
 		accessTokenValue = value;
-	})
-	usernameStore.subscribe(value => {
+	});
+	usernameStore.subscribe((value) => {
 		username = value;
-	})
-	isAdminStore.subscribe(value => {
+	});
+	isAdminStore.subscribe((value) => {
 		isAdmin = value;
-	})
+	});
 
 	initializeStores();
 
@@ -33,7 +33,7 @@
 	}
 
 	function drawerClose(): void {
-     	drawerStore.close();
+		drawerStore.close();
 	}
 </script>
 
@@ -44,36 +44,30 @@
 			<li><a href="/register" on:click={drawerClose}>Register</a></li>
 			<li><a href="/login" on:click={drawerClose}>Login</a></li>
 			{#if isAdmin}
-				<li ><a href="/create-movie" on:click={drawerClose}>Create Movie</a></li>
+				<li><a href="/create-movie" on:click={drawerClose}>Create Movie</a></li>
 				<li><a href="/edit-movie" on:click={drawerClose}>Edit Movie</a></li>
 			{/if}
+			<li><a href="/tickets" on:click={drawerClose}>My Tickets</a></li>
 		</ul>
-		
 	</nav>
 </Drawer>
 
+<Modal />
+
 <!-- App Shell -->
-<AppShell>	
+<AppShell>
 	<svelte:fragment slot="header">
 		<AppBar>
 			<svelte:fragment slot="trail">
-				<a
-					class="btn btn-sm variant-ghost-surface invisible md:visible"
-					href="/register"
-				>
+				<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/register">
 					Register
 				</a>
 
-				<a
-					class="btn btn-sm variant-ghost-surface invisible md:visible"
-					href="/login"
-				>
-					Login
-				</a>
+				<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/login"> Login </a>
 
 				{#if accessTokenValue !== ''}
 					<div class="invisible md:visible">
-						<Avatar initials={username}/>
+						<Avatar initials={username} />
 					</div>
 				{/if}
 			</svelte:fragment>
@@ -89,34 +83,34 @@
 							</svg>
 						</span>
 					</button>
-					<a href="/"><strong class="text-xl uppercase"><span style="color:#d4163c">Movie</span> Theatre</strong> <i class="fa-solid fa-film text-xl mr-4" /></a>
+					<a href="/"
+						><strong class="text-xl uppercase"
+							><span style="color:#d4163c">Movie</span> Theatre</strong
+						> <i class="fa-solid fa-film text-xl mr-4" /></a
+					>
 					{#if isAdmin}
 						<a
-						class="btn btn-sm variant-ghost-surface invisible md:visible mr-2"
-						href="/create-movie"
+							class="btn btn-sm variant-ghost-surface invisible md:visible mr-2"
+							href="/create-movie"
 						>
-						Create Movie
+							Create Movie
 						</a>
-						<a
-							class="btn btn-sm variant-ghost-surface invisible md:visible"
-							href="/edit-movie"
-						>
-						Edit Movie
+						<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/edit-movie">
+							Edit Movie
 						</a>
 					{/if}
-					
+					<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/tickets">
+						My Tickets
+					</a>
 				</div>
 			</svelte:fragment>
-
 		</AppBar>
 	</svelte:fragment>
 
 	<svelte:fragment slot="pageFooter">
 		<AppBar>
 			<svelte:fragment slot="lead">
-				<p class="text-s">
-					Website made by Ernestas Grubis
-				</p>
+				<p class="text-s">Website made by Ernestas Grubis</p>
 			</svelte:fragment>
 
 			<svelte:fragment slot="trail">

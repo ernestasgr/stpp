@@ -59,6 +59,7 @@ public class TicketController : ControllerBase
             ShowingNumber = showingId,
             MovieId = movieId,
             TicketType = ticketDTO.TicketType,
+            Seat = ticketDTO.Seat,
             UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
         };
 
@@ -67,7 +68,7 @@ public class TicketController : ControllerBase
         return CreatedAtAction(
             nameof(Get), 
             new{ movieId, showingId = ticket.ShowingNumber, ticketId = ticket.Id}, 
-            new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType));
+            new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat));
     }
 
     [HttpGet(Name = "GetManyTickets")]
@@ -109,7 +110,8 @@ public class TicketController : ControllerBase
             s.Price,
             s.MovieId,
             s.ShowingNumber,
-            s.TicketType
+            s.TicketType,
+            s.Seat
         )));
     }
 
@@ -130,7 +132,7 @@ public class TicketController : ControllerBase
             return Forbid();
         }
 
-        return new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType);
+        return new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat);
     }
 
     [HttpPut("{ticketId}")]
@@ -154,7 +156,7 @@ public class TicketController : ControllerBase
 
         await _ticketRepository.UpdateAsync(ticket);
 
-        return Ok(new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType));
+        return Ok(new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat));
     }
 
     [HttpDelete("{ticketId}")]
