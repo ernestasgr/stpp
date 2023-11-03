@@ -398,7 +398,7 @@
 			<div class="mb-4">
 				<label for="showingTimes" class="block text-sm font-medium mb-2">Showing Time</label>
 				{#each showingTimes as showing, index}
-					<div class="flex items-center mb-2">
+					<div class="flex flex-wrap items-center mb-2">
 						<div class="mr-4">
 							<label for="startTime" class="block text-xs font-medium mb-1">Start Time</label>
 							<input
@@ -431,7 +431,7 @@
 		</div>
 
 		<div class="flex">
-			<button type="submit" class="btn variant-filled">Edit Movie</button>
+			<button type="submit" class="btn variant-filled mr-2">Edit Movie</button>
 			<button
 				class="btn variant-filled-primary"
 				on:click={(e) => {

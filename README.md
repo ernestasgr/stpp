@@ -27,25 +27,22 @@ Sistema bus pasiekiama saityne, tam panaudojant debesų technologijas.
 
 **Naudotojas** galės:
 - Prisijungti / atsijungti
-- Valdyti savo paskyrą
 - Peržiūrėti informaciją apie filmus ir jų seansus.
 - Peržiūrėti tam tikro seanso bilietų informaciją.
 - Nusipirkti bilietą
 - Peržiūrėti savo bilietus, juos redaguoti (pvz: keisti seanso laiką, bilieto tipą) ar naikinti (jei įmanoma)
 - Parsisiųsti bilietą PDF formatu
-- Reitinguoti matytus filmus
 
 **Administratorius** galės:
 
 - Tą patį kaip ir naudotojas
 - Sukurti naujus filmus sistemoje, juos redaguoti ir ištrinti
 - Sukurti tam tikro filmo seansus, juos redaugoti ir ištrinti
-- Nustatyti vietų informaciją tam tikram seansui
 - Valdyti nupirktus bilietus
 
 # 2. Pasirinktų technologijų aprašymas
 
-Klientinė dalis bus realizuojama su React.js karkasu. Tai yra modernus ir efektyvus karkasus kurti naudotojo sąsajoms, kuris leidžia sąsają skirstyti į komponentus ir juos lengvai pernaudoti. Naudotojo sąsajai pagrąžinti bus naudojama Bootstrap biblioteka.
+Klientinė dalis bus realizuojama su Svelte karkasu. Tai yra modernus ir efektyvus karkasus kurti naudotojo sąsajoms, kuris leidžia sąsają skirstyti į komponentus ir juos lengvai pernaudoti. Naudotojo sąsajai pagrąžinti bus naudojama Tailwind CSS biblioteka ir Skeleton UI biblioteka.
 
 Serverinė dalis bus realizuojama su ASP.NET Core karkasu, kuris yra lengvai konfigūruojamas ir puikiai tinka kurti RESTful API.
 
