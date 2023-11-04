@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { accessToken, isAdminStore } from '../../stores';
+	import { jsPDF } from 'jspdf';
 
 	$: tickets = new Map();
 
@@ -192,6 +193,117 @@
 		tickets = tickets;
 		return await response.json();
 	}
+
+	async function download(movieId: number, showingNumber: number, id: number) {
+		console.log(`${movieId} ${showingNumber} ${id}`);
+		const doc = new jsPDF();
+
+		let data = {
+			ticketId: '',
+			movieId: '',
+			showingNumber: '',
+			ticketType: 0,
+			seat: '',
+			userId: '',
+			movieTitle: '',
+			startTime: '',
+			endTime: '',
+			price: 0
+		};
+
+		await fetch(
+			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingNumber}/tickets/${id}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${accessTokenValue}`
+				}
+			}
+		)
+			.then(async (response) => {
+				if (!response.ok) {
+					throw await response.text();
+				} else {
+					return await response.json();
+				}
+			})
+			.then(async (r) => {
+				data.ticketId = r.id;
+				data.movieId = r.movieId;
+				data.showingNumber = r.showingNumber;
+				data.ticketType = r.ticketType;
+				data.seat = r.seat;
+				data.userId = r.userId;
+				await fetch(`http://localhost:5157/api/v1/movies/${movieId}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${accessTokenValue}`
+					}
+				}).then(async (response) => {
+					if (!response.ok) {
+						throw await response.text();
+					} else {
+						let m = await response.json();
+						data.movieTitle = m.title;
+						await fetch(
+							`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingNumber}`,
+							{
+								method: 'GET',
+								headers: {
+									'Content-Type': 'application/json',
+									'Authorization': `Bearer ${accessTokenValue}`
+								}
+							}
+						).then(async (response) => {
+							if (!response.ok) {
+								throw await response.text();
+							} else {
+								let s = await response.json();
+								data.startTime = s.startTime;
+								data.endTime = s.endTime;
+								data.price = s.price;
+								if (data.ticketType === 1) {
+									data.price *= 1.5;
+								}
+							}
+						});
+					}
+				});
+			});
+
+		const image = new Image();
+		image.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${JSON.stringify(
+			data
+		)}`;
+
+		await new Promise((resolve) => {
+			image.onload = resolve;
+		});
+
+		doc.text(`MOVIE THEATRE TICKET`, 10, 10);
+		doc.text(`Movie ID: ${data.movieId}`, 10, 20);
+		doc.text(`Movie Title: ${data.movieTitle}`, 10, 30);
+		doc.text(``, 10, 40);
+
+		doc.text(`Showing Number: ${data.showingNumber}`, 10, 50);
+		doc.text(`Start Time: ${dateToUserFriendly(data.startTime)}`, 10, 60);
+		doc.text(`End Time: ${dateToUserFriendly(data.endTime)}`, 10, 70);
+		doc.text(``, 10, 80);
+
+		doc.text(`Ticket ID: ${data.ticketId}`, 10, 90);
+		doc.text(`Ticket Type: ${data.ticketType}`, 10, 100);
+		doc.text(`Price: ${data.price}€`, 10, 110);
+		doc.text(`Seat: ${data.seat}`, 10, 120);
+		doc.text(``, 10, 130);
+
+		doc.text(`User ID: ${data.userId}`, 10, 140);
+		doc.addImage(image, 'JPEG', 10, 150, 50, 50);
+
+		// Save the PDF
+		doc.save('ticket.pdf');
+	}
 </script>
 
 <strong class="uppercase text-l"><span style="color:#d4163c">My</span> Tickets:</strong>
@@ -239,6 +351,12 @@
 										type="button"
 										on:click={() => remove(t)}
 										class="text-red-500 hover:text-red-700 mr-2">Delete</button
+									>
+
+									<button
+										type="button"
+										on:click={() => download(movie.id, showing.number, t.id)}
+										class="text-green-500 hover:text-green-500 mr-2">Download</button
 									>
 								</td>
 							{/await}
