@@ -3,6 +3,7 @@
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	import { getModalStore, type ModalComponent, type ModalSettings } from '@skeletonlabs/skeleton';
 	import SeatingGrid from '../../../SeatingGrid.svelte';
+	import { usernameStore } from '../../../stores';
 
 	export let data;
 	/**
@@ -11,6 +12,10 @@
 	let elemCarousel: HTMLDivElement;
 
 	const modalStore = getModalStore();
+	let username: string;
+	usernameStore.subscribe((value) => {
+		username = value;
+	});
 
 	const modalComponent: ModalComponent = { ref: SeatingGrid };
 
@@ -218,12 +223,16 @@
 						<td>{dateToUserFriendly(showing.startTime)}</td>
 						<td>{dateToUserFriendly(showing.endTime)}</td>
 						<td>
-							<button
-								class="btn variant-filled-primary"
-								on:click={() => openModal(showing.number, showing.price)}
-							>
-								<p>Buy <i class="fa-solid fa-money-bill" /></p>
-							</button>
+							{#if username !== ''}
+								<button
+									class="btn variant-filled-primary"
+									on:click={() => openModal(showing.number, showing.price)}
+								>
+									<p>Buy <i class="fa-solid fa-money-bill" /></p>
+								</button>
+							{:else}
+								<p>Please login to buy a ticket</p>
+							{/if}
 						</td>
 					</tr>
 				{/each}
