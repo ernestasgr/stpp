@@ -2,6 +2,7 @@
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { accessToken } from './stores';
 	import { onMount } from 'svelte';
+	import { Toast, getToastStore } from '@skeletonlabs/skeleton';
 
 	// Define the data for your seating grid, assuming it's a 2D array.
 	let rows = 5;
@@ -27,6 +28,7 @@
 	});
 
 	const modalStore = getModalStore();
+	const toastStore = getToastStore();
 
 	for (let i = 0; i < rows; i++) {
 		let row = [];
@@ -93,6 +95,12 @@
 		}
 
 		modalStore.close();
+
+		const t = {
+			message: 'Tickets bought successfully!',
+			background: 'variant-filled-success'
+		};
+		toastStore.trigger(t);
 	}
 
 	onMount(() => {

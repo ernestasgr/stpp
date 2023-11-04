@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { accessToken, isAdminStore } from '../../stores';
 	import { jsPDF } from 'jspdf';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	const toastStore = getToastStore();
 
 	$: tickets = new Map();
 
@@ -160,8 +163,18 @@
 		);
 
 		if (response.ok) {
+			const t = {
+				message: 'Ticket upgraded successfully!',
+				background: 'variant-filled-success'
+			};
+			toastStore.trigger(t);
 			ticket.ticketType = 1;
 		} else {
+			const t = {
+				message: 'Error upgrading ticket! ' + (await response.text()),
+				background: 'variant-filled-error'
+			};
+			toastStore.trigger(t);
 			console.error('Failed to upgrade ticket');
 		}
 	}
@@ -179,19 +192,29 @@
 		);
 
 		if (!response.ok) {
-			throw await response.json();
+			const t = {
+				message: 'Error deleting ticket! ' + (await response.text()),
+				background: 'variant-filled-error'
+			};
+			toastStore.trigger(t);
+		} else {
+			let tIdx = tickets
+				.get(`${ticket.movieId}`)
+				.findIndex(
+					(t: { movieId: any; showingNumber: any; id: any }) =>
+						t.movieId === ticket.movieId &&
+						t.showingNumber === ticket.showingNumber &&
+						t.id === ticket.id
+				);
+			tickets.get(`${ticket.movieId}`).splice(tIdx, 1);
+			tickets = tickets;
+			const t = {
+				message: 'Ticket deleted successfully! ',
+				background: 'variant-filled-success'
+			};
+			toastStore.trigger(t);
+			return await response.json();
 		}
-		let tIdx = tickets
-			.get(`${ticket.movieId}`)
-			.findIndex(
-				(t: { movieId: any; showingNumber: any; id: any }) =>
-					t.movieId === ticket.movieId &&
-					t.showingNumber === ticket.showingNumber &&
-					t.id === ticket.id
-			);
-		tickets.get(`${ticket.movieId}`).splice(tIdx, 1);
-		tickets = tickets;
-		return await response.json();
 	}
 
 	async function download(movieId: number, showingNumber: number, id: number) {
@@ -271,6 +294,14 @@
 						});
 					}
 				});
+			})
+			.catch((error) => {
+				const t = {
+					message: 'Error while fetching data! ' + error,
+					background: 'variant-filled-error'
+				};
+				toastStore.trigger(t);
+				return;
 			});
 
 		const image = new Image();
@@ -300,6 +331,11 @@
 
 		doc.text(`User ID: ${data.userId}`, 10, 140);
 		doc.addImage(image, 'JPEG', 10, 150, 50, 50);
+		const t = {
+			message: 'PDF created successfully! ',
+			background: 'variant-filled-success'
+		};
+		toastStore.trigger(t);
 
 		// Save the PDF
 		doc.save('ticket.pdf');

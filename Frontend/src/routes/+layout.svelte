@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.postcss';
-	import { AppShell, AppBar, Avatar, Modal } from '@skeletonlabs/skeleton';
+	import { AppShell, AppBar, Avatar, Modal, Toast } from '@skeletonlabs/skeleton';
 	import { accessToken, isAdminStore, usernameStore } from '../stores';
 	import { initializeStores, Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
 	import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -53,6 +53,7 @@
 </Drawer>
 
 <Modal />
+<Toast />
 
 <!-- App Shell -->
 <AppShell>

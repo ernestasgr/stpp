@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { accessToken } from '../../stores';
+
+	const toastStore = getToastStore();
 
 	$: movie = {
 		title: '',
@@ -13,7 +16,6 @@
 
 	let showingTimes: any[] = [];
 
-	let createResult: string;
 	let createSuccessful = false;
 
 	let accessTokenValue: string;
@@ -70,18 +72,20 @@
 			.then(async (response) => {
 				console.log(response);
 				if (!response.ok) {
-					createResult = await response.text();
-					console.log(createResult);
+					let r = await response.text();
 					createSuccessful = false;
-					throw createResult;
+					throw r;
 				} else {
 					return response.json();
 				}
 			})
 			.then((response) => {
-				createResult = 'Movie created successfully!';
+				const t = {
+					message: 'Movie created successfully!',
+					background: 'variant-filled-success'
+				};
+				toastStore.trigger(t);
 				createSuccessful = true;
-				console.log(response);
 				return response;
 			})
 			.then(async (response) => {
@@ -100,27 +104,34 @@
 							'Authorization': `Bearer ${accessTokenValue}`
 						},
 						body: JSON.stringify(showingToUtc)
-					})
-						.then(async (response) => {
-							console.log(response);
-							if (!response.ok) {
-								createResult = await response.text();
-								console.log(createResult);
-								createSuccessful = false;
-								throw createResult;
-							} else {
-								return response.json();
-							}
-						})
-						.catch((error) => console.error('Error creating showing', error));
+					}).then(async (response) => {
+						console.log(response);
+						if (!response.ok) {
+							let r = await response.text();
+							createSuccessful = false;
+							throw r;
+						} else {
+							return response.json();
+						}
+					});
 				}
 			})
 			.then((response) => {
-				createResult = 'Movie created successfully!';
+				const t = {
+					message: 'Showings created successfully!',
+					background: 'variant-filled-success'
+				};
+				toastStore.trigger(t);
 				createSuccessful = true;
-				console.log(response);
 			})
-			.catch((error) => console.error('Error creating movie', error));
+			.catch((error) => {
+				const t = {
+					message: 'Error creating movie! ' + error,
+					background: 'variant-filled-error'
+				};
+				toastStore.trigger(t);
+				console.error('Error creating movie', error);
+			});
 	}
 
 	function removeShowingTime(index: number): any {
@@ -240,7 +251,3 @@
 		<button type="submit" class="btn variant-filled">Create Movie</button>
 	</form>
 </main>
-
-{#if createResult}
-	<p>{createResult}</p>
-{/if}

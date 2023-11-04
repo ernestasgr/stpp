@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { accessToken } from '../../stores';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	const toastStore = getToastStore();
 
 	$: movieEdit = {
 		id: 0,
@@ -87,7 +90,11 @@
 				}
 			})
 			.then((response) => {
-				editResult = 'Movie edited successfully!';
+				const t = {
+					message: 'Movie edited successfully!',
+					background: 'variant-filled-success'
+				};
+				toastStore.trigger(t);
 				editSuccessful = true;
 				console.log(response);
 			})
@@ -113,19 +120,29 @@
 							},
 							body: JSON.stringify(showingData)
 						}
-					)
-						.then(async (response) => {
-							console.log(response);
-							if (!response.ok) {
-								throw await response.text();
-							} else {
-								return response.json();
-							}
-						})
-						.catch((error) => console.error('Error editing showing', error));
+					).then(async (response) => {
+						console.log(response);
+						if (!response.ok) {
+							throw await response.text();
+						} else {
+							return response.json();
+						}
+					});
 				}
+				const t = {
+					message: 'Showings edited successfully!',
+					background: 'variant-filled-success'
+				};
+				toastStore.trigger(t);
 			})
-			.catch((error) => console.error('Error editing movie', error));
+			.catch((error) => {
+				const t = {
+					message: 'Error editing movie! ' + error,
+					background: 'variant-filled-error'
+				};
+				toastStore.trigger(t);
+				console.error('Error editing movie', error);
+			});
 	}
 
 	onMount(() => {
@@ -269,6 +286,11 @@
 					const index = movies.findIndex((movie) => movie.id === movieEdit.id);
 					if (index !== -1) {
 						movies = movies.filter((_, i) => i !== index);
+						const t = {
+							message: 'Movie deleted successfully!',
+							background: 'variant-filled-success'
+						};
+						toastStore.trigger(t);
 						console.log('Movie deleted from array');
 						console.log(movies);
 						movieEdit = movies[0];
@@ -277,7 +299,14 @@
 					}
 				}
 			})
-			.catch((error) => console.error('Error deleting movie', error));
+			.catch((error) => {
+				const t = {
+					message: 'Error deleting movie! ' + error,
+					background: 'variant-filled-error'
+				};
+				toastStore.trigger(t);
+				console.error('Error deleting movie', error);
+			});
 	}
 
 	function removeShowingTime(index: number): any {
