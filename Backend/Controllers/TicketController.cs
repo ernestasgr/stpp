@@ -54,7 +54,6 @@ public class TicketController : ControllerBase
         var ticket = new Ticket
         {
             Id = maxTicketId + 1,
-            Price = ticketDTO.Price,
             Showing = showing,
             ShowingNumber = showingId,
             MovieId = movieId,
@@ -68,16 +67,16 @@ public class TicketController : ControllerBase
         return CreatedAtAction(
             nameof(Get), 
             new{ movieId, showingId = ticket.ShowingNumber, ticketId = ticket.Id}, 
-            new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat));
+            new TicketDTO(ticket.Id, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat, ticket.UserId));
     }
 
     [HttpGet(Name = "GetManyTickets")]
     [Authorize(Roles = UserRoles.Viewer)]
-    public async Task<ActionResult<IEnumerable<TicketDTO>>> GetMany([FromQuery] SearchParameters parameters, int movieId = -1, int showingId = -1)
+    public async Task<ActionResult<IEnumerable<TicketDTO>>> GetMany([FromQuery] SearchParameters parameters, int movieId = -1, int showingId = -1, bool getAll = false)
     {
         PagedList<Ticket> tickets;
 
-        if(!User.IsInRole(UserRoles.Admin))
+        if(!User.IsInRole(UserRoles.Admin) && !getAll)
         {
             tickets = await (_ticketRepository as TicketRepository)!.GetManyForUserAsync(movieId, showingId, userId: User.FindFirstValue(JwtRegisteredClaimNames.Sub), parameters: parameters);
         }
@@ -107,11 +106,11 @@ public class TicketController : ControllerBase
         //200
         return Ok(tickets.Select(s => new TicketDTO(
             s.Id,
-            s.Price,
             s.MovieId,
             s.ShowingNumber,
             s.TicketType,
-            s.Seat
+            s.Seat,
+            s.UserId
         )));
     }
 
@@ -132,7 +131,7 @@ public class TicketController : ControllerBase
             return Forbid();
         }
 
-        return new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat);
+        return new TicketDTO(ticket.Id, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat, ticket.UserId);
     }
 
     [HttpPut("{ticketId}")]
@@ -156,7 +155,7 @@ public class TicketController : ControllerBase
 
         await _ticketRepository.UpdateAsync(ticket);
 
-        return Ok(new TicketDTO(ticket.Id, ticket.Price, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat));
+        return Ok(new TicketDTO(ticket.Id, ticket.MovieId, ticket.ShowingNumber, ticket.TicketType, ticket.Seat, ticket.UserId));
     }
 
     [HttpDelete("{ticketId}")]

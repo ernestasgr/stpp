@@ -63,7 +63,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${accessTokenValue}`
+				'Authorization': `Bearer ${accessTokenValue}`
 			},
 			body: JSON.stringify(data)
 		})
@@ -89,14 +89,15 @@
 				for (let i = 0; i < showingTimes.length; i++) {
 					let showingToUtc = {
 						startTime: showingTimes[i].startTime + ':00Z',
-						endTime: showingTimes[i].endTime + ':00Z'
+						endTime: showingTimes[i].endTime + ':00Z',
+						price: showingTimes[i].price
 					};
 					console.log(showingToUtc);
 					await fetch(`http://localhost:5157/api/v1/movies/${response.id}/showings`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
-							Authorization: `Bearer ${accessTokenValue}`
+							'Authorization': `Bearer ${accessTokenValue}`
 						},
 						body: JSON.stringify(showingToUtc)
 					})
@@ -127,7 +128,7 @@
 	}
 
 	function addShowingTime() {
-		showingTimes = [...showingTimes, { startTime: '', endTime: '' }];
+		showingTimes = [...showingTimes, { startTime: '', endTime: '', price: 0 }];
 		console.log(showingTimes);
 	}
 </script>
@@ -212,6 +213,15 @@
 								bind:value={showingTimes[index].endTime}
 								class="input mb-2"
 								placeholder="End Time"
+							/>
+						</div>
+						<div class="mr-4">
+							<label for="price" class="block text-xs font-medium mb-1">Price</label>
+							<input
+								type="number"
+								bind:value={showingTimes[index].price}
+								class="input mb-2"
+								placeholder="Price"
 							/>
 						</div>
 						<button

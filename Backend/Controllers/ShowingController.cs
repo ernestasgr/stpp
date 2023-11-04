@@ -58,6 +58,7 @@ public class ShowingController : ControllerBase
             EndTime = showingDTO.EndTime,
             MovieId = movieId,
             Movie = movie,
+            Price = showingDTO.Price,
             UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
         };
 
@@ -66,7 +67,7 @@ public class ShowingController : ControllerBase
         return CreatedAtAction(
             nameof(Get), 
             new{movieId = showing.MovieId, showingId = showing.Number}, 
-            new ShowingDTO(showing.Number, showing.StartTime, showing.EndTime, showing.MovieId));
+            new ShowingDTO(showing.Number, showing.StartTime, showing.EndTime, showing.MovieId, showing.Price));
     }
 
     [HttpGet(Name = "GetManyShowings")]
@@ -97,7 +98,8 @@ public class ShowingController : ControllerBase
             s.Number,
             s.StartTime,
             s.EndTime,
-            s.MovieId
+            s.MovieId,
+            s.Price
         )));
     }
 
@@ -111,7 +113,7 @@ public class ShowingController : ControllerBase
             return NotFound();
         }
 
-        return new ShowingDTO(showingId, showing.StartTime, showing.EndTime, movieId);
+        return new ShowingDTO(showingId, showing.StartTime, showing.EndTime, movieId, showing.Price);
     }
 
     [HttpPut("{showingId}")]
@@ -143,7 +145,7 @@ public class ShowingController : ControllerBase
 
         await _showingRepository.UpdateAsync(showing);
 
-        return Ok(new ShowingDTO(showingId, showing.StartTime, showing.EndTime, movieId));
+        return Ok(new ShowingDTO(showingId, showing.StartTime, showing.EndTime, movieId, showing.Price));
     }
 
     [HttpDelete("{showingId}")]

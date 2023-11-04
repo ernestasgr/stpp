@@ -18,6 +18,9 @@
 	 * @type {any[]}
 	 */
 	let boughtTickets = [];
+	let checked = false;
+	let initialPrice = 0;
+	let price = 0;
 
 	accessToken.subscribe((value) => {
 		accessTokenValue = value;
@@ -51,17 +54,19 @@
 		if (!containsSeat) {
 			seatingGrid[row][column].isOccupied = !seatingGrid[row][column].isOccupied;
 		}
+		getTotalPrice();
 	}
 
 	async function buy() {
 		let movieId = $modalStore[0].meta.movieId;
 		let showingId = $modalStore[0].meta.showingId;
+		let price = $modalStore[0].meta.price;
 		for (let i = 0; i < seatingGrid.length; i++) {
 			for (let j = 0; j < seatingGrid[i].length; j++) {
 				if (seatingGrid[i][j].isOccupied) {
 					let data = {
-						price: 5,
-						ticketType: 0,
+						price: price,
+						ticketType: checked ? 1 : 0,
 						seat: i + 1 + '-' + (j + 1)
 					};
 					await fetch(
@@ -70,7 +75,7 @@
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
-								Authorization: `Bearer ${accessTokenValue}`
+								'Authorization': `Bearer ${accessTokenValue}`
 							},
 							body: JSON.stringify(data)
 						}
@@ -93,13 +98,14 @@
 	onMount(() => {
 		let movieId = $modalStore[0].meta.movieId;
 		let showingId = $modalStore[0].meta.showingId;
+		initialPrice = $modalStore[0].meta.price;
 		fetch(
-			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingId}/tickets?PageNumber=1&PageSize=50`,
+			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingId}/tickets?PageNumber=1&PageSize=50&getAll=true`,
 			{
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${accessTokenValue}`
+					'Authorization': `Bearer ${accessTokenValue}`
 				}
 			}
 		)
@@ -118,6 +124,29 @@
 			})
 			.catch((error) => console.error('Error getting tickets', error));
 	});
+
+	/**
+	 * @param {any} _event
+	 */
+	function handleClick(_event) {
+		checked = !checked;
+		getTotalPrice();
+	}
+
+	function getTotalPrice() {
+		price = 0;
+		for (let i = 0; i < seatingGrid.length; i++) {
+			for (let j = 0; j < seatingGrid[i].length; j++) {
+				if (seatingGrid[i][j].isOccupied) {
+					price += initialPrice;
+				}
+			}
+		}
+		if (checked) {
+			price *= 3 / 2;
+		}
+		return price;
+	}
 </script>
 
 <!-- HTML structure for the modal -->
@@ -144,12 +173,16 @@
 		</div>
 
 		<!-- Close button -->
-		<button class="mt-4 variant-filled-primary py-2 px-4 rounded-md" on:click={() => buy()}>
-			Buy
-			<i class="fa-solid fa-money-bill" />
-		</button>
-		{#if $modalStore[0]}
-			<p>{JSON.stringify($modalStore[0].meta)}</p>
-		{/if}
+		<div class="flex items-center">
+			<button class="mt-4 variant-filled-primary py-2 px-4 rounded-md mr-4" on:click={() => buy()}>
+				Buy
+				<i class="fa-solid fa-money-bill" />
+			</button>
+			<label class="flex items-center space-x-2 justify-center">
+				<p>Buy Premium?</p>
+				<input id="premium" class="checkbox" type="checkbox" bind:checked on:click={handleClick} />
+			</label>
+			<p class="ml-auto">Price: {price}€</p>
+		</div>
 	</div>
 </div>

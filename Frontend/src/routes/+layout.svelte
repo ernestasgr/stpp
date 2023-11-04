@@ -95,7 +95,10 @@
 						>
 							Create Movie
 						</a>
-						<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/edit-movie">
+						<a
+							class="btn btn-sm variant-ghost-surface invisible md:visible mr-2"
+							href="/edit-movie"
+						>
 							Edit Movie
 						</a>
 					{/if}

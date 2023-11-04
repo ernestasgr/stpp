@@ -9,11 +9,12 @@ public class Showing
     public int MovieId { get; set; }
     public Movie Movie { get; set; }
     public int Number { get; set; }
+    public decimal Price { get; set; }
     public List<Ticket> Tickets { get; set; }
     [Required]
     public string UserId { get; set; }
     public User User { get; set; } = null!;
-    public Showing(DateTime startTime, DateTime endTime, int movieId, Movie movie, string userId)
+    public Showing(DateTime startTime, DateTime endTime, int movieId, Movie movie, string userId, decimal price)
     {
         StartTime = startTime;
         EndTime = endTime;
@@ -21,6 +22,7 @@ public class Showing
         Movie = movie;
         Tickets = new List<Ticket>();
         UserId = userId;
+        Price = price;
     }
     public Showing()
     {

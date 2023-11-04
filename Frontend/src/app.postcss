@@ -3,6 +3,19 @@
 @tailwind utilities;
 @tailwind variants;
 
+@font-face {
+	/* Reference name */
+	font-family: 'OpenSans';
+	/* For multiple files use commas, ex: url(), url(), ... */
+	src: url('/fonts/OpenSans-VariableFont_wdth,wght.ttf');
+}
+
+:root [data-theme='crimson'] {
+	--theme-font-family-base: 'OpenSans', sans-serif;
+	--theme-font-family-heading: 'OpenSans', sans-serif;
+	/* ... */
+}
+
 html,
 body {
 	@apply h-full overflow-hidden;

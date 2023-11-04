@@ -22,6 +22,7 @@
 		{
 			startTime: '2000-01-01T00:00:00Z',
 			endTime: '2000-01-01T00:00:00Z',
+			price: 0,
 			movieId: '',
 			number: ''
 		}
@@ -70,7 +71,7 @@
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${accessTokenValue}`
+				'Authorization': `Bearer ${accessTokenValue}`
 			},
 			body: JSON.stringify(data)
 		})
@@ -96,6 +97,7 @@
 					let showingData = {
 						startTime: showing.startTime + ':00Z',
 						endTime: showing.endTime + ':00Z',
+						price: showing.price,
 						number: showing.number,
 						movieId: showing.movieId
 					};
@@ -107,7 +109,7 @@
 							method: httpType,
 							headers: {
 								'Content-Type': 'application/json',
-								Authorization: `Bearer ${accessTokenValue}`
+								'Authorization': `Bearer ${accessTokenValue}`
 							},
 							body: JSON.stringify(showingData)
 						}
@@ -256,7 +258,7 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${accessTokenValue}`
+				'Authorization': `Bearer ${accessTokenValue}`
 			}
 		})
 			.then(async (response) => {
@@ -279,13 +281,14 @@
 	}
 
 	function removeShowingTime(index: number): any {
+		console.log(accessTokenValue);
 		fetch(
 			`http://localhost:5157/api/v1/movies/${movieEdit.id}/showings/${showingTimes[index].number}`,
 			{
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${accessTokenValue}`
+					'Authorization': `Bearer ${accessTokenValue}`
 				}
 			}
 		)
@@ -301,7 +304,10 @@
 	}
 
 	function addShowingTime() {
-		showingTimes = [...showingTimes, { startTime: '', endTime: '', movieId: '', number: '' }];
+		showingTimes = [
+			...showingTimes,
+			{ startTime: '', endTime: '', movieId: '', number: '', price: 0 }
+		];
 		console.log(showingTimes);
 	}
 
@@ -415,6 +421,15 @@
 								bind:value={showingTimes[index].endTime}
 								class="input mb-2"
 								placeholder="End Time"
+							/>
+						</div>
+						<div class="mr-4">
+							<label for="price" class="block text-xs font-medium mb-1">Price</label>
+							<input
+								type="number"
+								bind:value={showingTimes[index].price}
+								class="input mb-2"
+								placeholder="Price"
 							/>
 						</div>
 						<button

@@ -35,7 +35,8 @@
 		{
 			startTime: '2000-01-01T08:00:00Z',
 			endTime: '2000-01-02T08:00:00Z',
-			number: ''
+			number: '',
+			price: 0
 		}
 	];
 
@@ -114,9 +115,10 @@
 		return splitDate[0] + ' ' + splitDate[1].split(':')[0] + ':' + splitDate[1].split(':')[1];
 	}
 
-	function openModal(showingId: string) {
+	function openModal(showingId: string, price: number) {
 		modal.meta.movieId = movie.id;
 		modal.meta.showingId = showingId;
+		modal.meta.price = price;
 		modalStore.trigger(modal);
 	}
 </script>
@@ -216,7 +218,10 @@
 						<td>{dateToUserFriendly(showing.startTime)}</td>
 						<td>{dateToUserFriendly(showing.endTime)}</td>
 						<td>
-							<button class="btn variant-filled-primary" on:click={() => openModal(showing.number)}>
+							<button
+								class="btn variant-filled-primary"
+								on:click={() => openModal(showing.number, showing.price)}
+							>
 								<p>Buy <i class="fa-solid fa-money-bill" /></p>
 							</button>
 						</td>
