@@ -1,6 +1,7 @@
 <script>
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import { accessToken, isAdminStore, usernameStore } from '../../stores';
+	import { goto } from '$app/navigation';
 
 	const toastStore = getToastStore();
 	let username = '';
@@ -64,6 +65,7 @@
 				toastStore.trigger(t);
 				console.error('Error logging in', error);
 			});
+		goto('/');
 	}
 
 	function checkAdminRole() {

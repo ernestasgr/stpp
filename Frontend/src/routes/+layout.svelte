@@ -41,13 +41,20 @@
 	<nav class="list-nav p-4">
 		<ul>
 			<li><a href="/" on:click={drawerClose}>Home</a></li>
-			<li><a href="/register" on:click={drawerClose}>Register</a></li>
-			<li><a href="/login" on:click={drawerClose}>Login</a></li>
+			{#if username === ''}
+				<li><a href="/register" on:click={drawerClose}>Register</a></li>
+				<li><a href="/login" on:click={drawerClose}>Login</a></li>
+			{:else}
+				<li><a href="/logout" on:click={drawerClose}>Logout</a></li>
+			{/if}
+
 			{#if isAdmin}
 				<li><a href="/create-movie" on:click={drawerClose}>Create Movie</a></li>
 				<li><a href="/edit-movie" on:click={drawerClose}>Edit Movie</a></li>
 			{/if}
-			<li><a href="/tickets" on:click={drawerClose}>My Tickets</a></li>
+			{#if username !== ''}
+				<li><a href="/tickets" on:click={drawerClose}>My Tickets</a></li>
+			{/if}
 		</ul>
 	</nav>
 </Drawer>
@@ -60,11 +67,15 @@
 	<svelte:fragment slot="header">
 		<AppBar>
 			<svelte:fragment slot="trail">
-				<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/register">
-					Register
-				</a>
+				{#if username === ''}
+					<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/register">
+						Register
+					</a>
 
-				<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/login"> Login </a>
+					<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/login"> Login </a>
+				{:else}
+					<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/logout">Logout</a>
+				{/if}
 
 				{#if accessTokenValue !== ''}
 					<div class="invisible md:visible">
@@ -103,9 +114,11 @@
 							Edit Movie
 						</a>
 					{/if}
-					<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/tickets">
-						My Tickets
-					</a>
+					{#if username !== ''}
+						<a class="btn btn-sm variant-ghost-surface invisible md:visible" href="/tickets">
+							My Tickets
+						</a>
+					{/if}
 				</div>
 			</svelte:fragment>
 		</AppBar>

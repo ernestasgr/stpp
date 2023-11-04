@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 
 	const toastStore = getToastStore();
@@ -76,6 +77,7 @@
 				toastStore.trigger(t);
 				console.error('Error registering', error);
 			});
+		goto('/login');
 	}
 
 	/**

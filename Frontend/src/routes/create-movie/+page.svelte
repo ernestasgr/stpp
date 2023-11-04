@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getToastStore } from '@skeletonlabs/skeleton';
-	import { accessToken } from '../../stores';
+	import { accessToken, isAdminStore } from '../../stores';
 
 	const toastStore = getToastStore();
 
@@ -19,9 +19,13 @@
 	let createSuccessful = false;
 
 	let accessTokenValue: string;
+	let isAdmin: boolean;
 
 	accessToken.subscribe((value) => {
 		accessTokenValue = value;
+	});
+	isAdminStore.subscribe((value) => {
+		isAdmin = value;
 	});
 
 	function addImage() {
@@ -144,110 +148,116 @@
 	}
 </script>
 
-<main class="p-4">
-	<h1 class="text-3xl font-semibold mb-4">Create a Movie</h1>
+{#if isAdmin}
+	<main class="p-4">
+		<h1 class="text-3xl font-semibold mb-4">Create a Movie</h1>
 
-	<form on:submit|preventDefault={createMovie}>
-		<div class="mb-4">
-			<label for="title" class="block text-sm font-medium mb-2">Title</label>
-			<input type="text" id="title" bind:value={movie.title} class="input" />
-		</div>
-
-		<div class="mb-4">
-			<label for="description" class="block text-sm font-medium mb-2">Description</label>
-			<textarea id="description" bind:value={movie.description} class="input" rows="4" />
-		</div>
-
-		<div class="mb-4">
-			<label for="releaseDate" class="block text-sm font-medium mb-2">Release Date</label>
-			<input type="date" id="releaseDate" bind:value={movie.releaseDate} class="input" />
-		</div>
-
-		<div class="mb-4">
-			<label for="director" class="block text-sm font-medium mb-2">Director</label>
-			<input type="text" id="director" bind:value={movie.director} class="input" />
-		</div>
-
-		<div class="mb-4">
-			<label for="mainImage" class="block text-sm font-medium mb-2">Main Image</label>
-			<input type="url" bind:value={movie.mainImage} class="input" />
-		</div>
-
-		<div class="mb-4">
-			<label for="images" class="block text-sm font-medium mb-2">Images</label>
-			{#each movie.images as image, index}
-				<div class="flex items-center mb-2">
-					<input type="url" bind:value={movie.images[index]} class="input mr-2" />
-					<button
-						type="button"
-						on:click={() => removeImage(index)}
-						class="text-red-500 hover:text-red-700">Remove</button
-					>
-				</div>
-			{/each}
-			<button type="button" on:click={addImage} class="btn btn-sm variant-filled">Add Image</button>
-		</div>
-
-		<div class="mb-4">
-			<label for="videos" class="block text-sm font-medium mb-2">Videos</label>
-			{#each movie.videos as video, index}
-				<div class="flex items-center mb-2">
-					<input type="url" bind:value={movie.videos[index]} class="input mr-2" />
-					<button
-						type="button"
-						on:click={() => removeVideo(index)}
-						class="text-red-500 hover:text-red-700">Remove</button
-					>
-				</div>
-			{/each}
-			<button type="button" on:click={addVideo} class="btn btn-sm variant-filled">Add Video</button>
-		</div>
-
-		<div class="flex">
+		<form on:submit|preventDefault={createMovie}>
 			<div class="mb-4">
-				<label for="showingTimes" class="block text-sm font-medium mb-2">Showing Time</label>
-				{#each showingTimes as showing, index}
+				<label for="title" class="block text-sm font-medium mb-2">Title</label>
+				<input type="text" id="title" bind:value={movie.title} class="input" />
+			</div>
+
+			<div class="mb-4">
+				<label for="description" class="block text-sm font-medium mb-2">Description</label>
+				<textarea id="description" bind:value={movie.description} class="input" rows="4" />
+			</div>
+
+			<div class="mb-4">
+				<label for="releaseDate" class="block text-sm font-medium mb-2">Release Date</label>
+				<input type="date" id="releaseDate" bind:value={movie.releaseDate} class="input" />
+			</div>
+
+			<div class="mb-4">
+				<label for="director" class="block text-sm font-medium mb-2">Director</label>
+				<input type="text" id="director" bind:value={movie.director} class="input" />
+			</div>
+
+			<div class="mb-4">
+				<label for="mainImage" class="block text-sm font-medium mb-2">Main Image</label>
+				<input type="url" bind:value={movie.mainImage} class="input" />
+			</div>
+
+			<div class="mb-4">
+				<label for="images" class="block text-sm font-medium mb-2">Images</label>
+				{#each movie.images as image, index}
 					<div class="flex items-center mb-2">
-						<div class="mr-4">
-							<label for="startTime" class="block text-xs font-medium mb-1">Start Time</label>
-							<input
-								type="datetime-local"
-								bind:value={showingTimes[index].startTime}
-								class="input mb-2"
-								placeholder="Start Time"
-							/>
-						</div>
-						<div class="mr-4">
-							<label for="endTime" class="block text-xs font-medium mb-1">End Time</label>
-							<input
-								type="datetime-local"
-								bind:value={showingTimes[index].endTime}
-								class="input mb-2"
-								placeholder="End Time"
-							/>
-						</div>
-						<div class="mr-4">
-							<label for="price" class="block text-xs font-medium mb-1">Price</label>
-							<input
-								type="number"
-								bind:value={showingTimes[index].price}
-								class="input mb-2"
-								placeholder="Price"
-							/>
-						</div>
+						<input type="url" bind:value={movie.images[index]} class="input mr-2" />
 						<button
 							type="button"
-							on:click={() => removeShowingTime(index)}
+							on:click={() => removeImage(index)}
 							class="text-red-500 hover:text-red-700">Remove</button
 						>
 					</div>
 				{/each}
-				<button type="button" on:click={addShowingTime} class="btn btn-sm variant-filled"
-					>Add Showing</button
+				<button type="button" on:click={addImage} class="btn btn-sm variant-filled"
+					>Add Image</button
 				>
 			</div>
-		</div>
 
-		<button type="submit" class="btn variant-filled">Create Movie</button>
-	</form>
-</main>
+			<div class="mb-4">
+				<label for="videos" class="block text-sm font-medium mb-2">Videos</label>
+				{#each movie.videos as video, index}
+					<div class="flex items-center mb-2">
+						<input type="url" bind:value={movie.videos[index]} class="input mr-2" />
+						<button
+							type="button"
+							on:click={() => removeVideo(index)}
+							class="text-red-500 hover:text-red-700">Remove</button
+						>
+					</div>
+				{/each}
+				<button type="button" on:click={addVideo} class="btn btn-sm variant-filled"
+					>Add Video</button
+				>
+			</div>
+
+			<div class="flex">
+				<div class="mb-4">
+					<label for="showingTimes" class="block text-sm font-medium mb-2">Showing Time</label>
+					{#each showingTimes as showing, index}
+						<div class="flex items-center mb-2">
+							<div class="mr-4">
+								<label for="startTime" class="block text-xs font-medium mb-1">Start Time</label>
+								<input
+									type="datetime-local"
+									bind:value={showingTimes[index].startTime}
+									class="input mb-2"
+									placeholder="Start Time"
+								/>
+							</div>
+							<div class="mr-4">
+								<label for="endTime" class="block text-xs font-medium mb-1">End Time</label>
+								<input
+									type="datetime-local"
+									bind:value={showingTimes[index].endTime}
+									class="input mb-2"
+									placeholder="End Time"
+								/>
+							</div>
+							<div class="mr-4">
+								<label for="price" class="block text-xs font-medium mb-1">Price</label>
+								<input
+									type="number"
+									bind:value={showingTimes[index].price}
+									class="input mb-2"
+									placeholder="Price"
+								/>
+							</div>
+							<button
+								type="button"
+								on:click={() => removeShowingTime(index)}
+								class="text-red-500 hover:text-red-700">Remove</button
+							>
+						</div>
+					{/each}
+					<button type="button" on:click={addShowingTime} class="btn btn-sm variant-filled"
+						>Add Showing</button
+					>
+				</div>
+			</div>
+
+			<button type="submit" class="btn variant-filled">Create Movie</button>
+		</form>
+	</main>
+{/if}
