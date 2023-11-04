@@ -169,7 +169,7 @@
 			{#each seatingGrid as row, i}
 				{#each row as seat, j}
 					<div
-						class="w-10 h-10 flex justify-center items-center border border-gray-500 rounded-md cursor-pointer"
+						class="w-8 h-8 text-sm md:w-10 md:h-10 flex justify-center items-center border border-gray-500 rounded-md cursor-pointer"
 						class:bg-green-600={seat.isOccupied}
 						class:variant-filled-primary={seat.isBought}
 						on:click={() => toggleSeat(i, j)}
