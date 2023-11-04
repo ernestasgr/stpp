@@ -136,8 +136,17 @@
 			ticketType: 1,
 			seat: ticket.seat
 		};
-		ticket.ticketType = 1;
-		const f = await fetch(
+		let newTickets = new Map(tickets);
+		let a = newTickets.get(`${movieId}`);
+		let matchingTicket = a.find(
+			(t: { showingNumber: number; id: any }) => t.showingNumber === showing && t.id === ticket.id
+		);
+		if (matchingTicket) {
+			matchingTicket.ticketType = 1;
+		}
+		tickets = newTickets;
+
+		const response = await fetch(
 			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showing}/tickets/${ticket.id}`,
 			{
 				method: 'PUT',
@@ -148,7 +157,40 @@
 				body: JSON.stringify(data)
 			}
 		);
-		return f.json();
+
+		if (response.ok) {
+			ticket.ticketType = 1;
+		} else {
+			console.error('Failed to upgrade ticket');
+		}
+	}
+
+	async function remove(ticket: { movieId: any; showingNumber: any; id: any }) {
+		const response = await fetch(
+			`http://localhost:5157/api/v1/movies/${ticket.movieId}/showings/${ticket.showingNumber}/tickets/${ticket.id}`,
+			{
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${accessTokenValue}`
+				}
+			}
+		);
+
+		if (!response.ok) {
+			throw await response.json();
+		}
+		let tIdx = tickets
+			.get(`${ticket.movieId}`)
+			.findIndex(
+				(t: { movieId: any; showingNumber: any; id: any }) =>
+					t.movieId === ticket.movieId &&
+					t.showingNumber === ticket.showingNumber &&
+					t.id === ticket.id
+			);
+		tickets.get(`${ticket.movieId}`).splice(tIdx, 1);
+		tickets = tickets;
+		return await response.json();
 	}
 </script>
 
@@ -195,7 +237,7 @@
 
 									<button
 										type="button"
-										on:click={() => removeShowingTime(index)}
+										on:click={() => remove(t)}
 										class="text-red-500 hover:text-red-700 mr-2">Delete</button
 									>
 								</td>
