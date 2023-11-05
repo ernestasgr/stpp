@@ -65,7 +65,7 @@
 			videos: movie.videos
 		};
 
-		fetch('http://localhost:5157/api/v1/movies', {
+		fetch('https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -74,7 +74,6 @@
 			body: JSON.stringify(data)
 		})
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					let r = await response.text();
 					createSuccessful = false;
@@ -93,23 +92,23 @@
 				return response;
 			})
 			.then(async (response) => {
-				console.log(response);
 				for (let i = 0; i < showingTimes.length; i++) {
 					let showingToUtc = {
 						startTime: showingTimes[i].startTime + ':00Z',
 						endTime: showingTimes[i].endTime + ':00Z',
 						price: showingTimes[i].price
 					};
-					console.log(showingToUtc);
-					await fetch(`http://localhost:5157/api/v1/movies/${response.id}/showings`, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': `Bearer ${accessTokenValue}`
-						},
-						body: JSON.stringify(showingToUtc)
-					}).then(async (response) => {
-						console.log(response);
+					await fetch(
+						`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${response.id}/showings`,
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'Authorization': `Bearer ${accessTokenValue}`
+							},
+							body: JSON.stringify(showingToUtc)
+						}
+					).then(async (response) => {
 						if (!response.ok) {
 							let r = await response.text();
 							createSuccessful = false;
@@ -134,7 +133,6 @@
 					background: 'variant-filled-error'
 				};
 				toastStore.trigger(t);
-				console.error('Error creating movie', error);
 			});
 	}
 
@@ -144,7 +142,6 @@
 
 	function addShowingTime() {
 		showingTimes = [...showingTimes, { startTime: '', endTime: '', price: 0 }];
-		console.log(showingTimes);
 	}
 </script>
 

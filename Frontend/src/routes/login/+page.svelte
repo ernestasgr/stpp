@@ -28,7 +28,7 @@
 			username: username,
 			password: password
 		};
-		fetch('http://localhost:5157/api/v1/login', {
+		fetch('https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/login', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -49,7 +49,6 @@
 				usernameStore.set(username);
 				checkAdminRole();
 				isAdminStore.set(isAdmin);
-				console.log('is admin: ' + isAdmin);
 				loginSuccessful = true;
 				const t = {
 					message: 'User logged in successfully!',
@@ -63,7 +62,6 @@
 					background: 'variant-filled-error'
 				};
 				toastStore.trigger(t);
-				console.error('Error logging in', error);
 			});
 		goto('/');
 	}
@@ -72,24 +70,19 @@
 		try {
 			const decodedToken = parseJwt(accessTokenValue);
 			let roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-			console.log(roles);
 
 			if (decodedToken && roles.includes('Admin')) {
-				console.log('true');
 				isAdmin = true;
 			} else {
 				isAdmin = false;
 			}
-		} catch (error) {
-			console.error('Error parsing or checking token:', error);
-		}
+		} catch (error) {}
 	}
 
 	/**
 	 * @param {string} token
 	 */
 	function parseJwt(token) {
-		console.log(token);
 		var base64Url = token.split('.')[1];
 		var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 		var jsonPayload = decodeURIComponent(

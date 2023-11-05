@@ -43,7 +43,7 @@
 			email: email,
 			password: password
 		};
-		fetch('http://localhost:5157/api/v1/register', {
+		fetch('https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/register', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -51,7 +51,6 @@
 			body: JSON.stringify(data)
 		})
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					let r = await response.text();
 					registrationSuccessful = false;
@@ -67,7 +66,6 @@
 				};
 				toastStore.trigger(t);
 				registrationSuccessful = true;
-				console.log(response);
 			})
 			.catch((error) => {
 				const t = {
@@ -75,7 +73,6 @@
 					background: 'variant-filled-error'
 				};
 				toastStore.trigger(t);
-				console.error('Error registering', error);
 			});
 		goto('/login');
 	}

@@ -20,47 +20,44 @@
 	});
 
 	onMount(() => {
-		console.log(accessTokenValue);
-		fetch(`http://localhost:5157/api/v1/movies/-1/showings/-1/tickets?PageNumber=1&PageSize=50`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${accessTokenValue}`
-			}
-		})
-			.then(async (response) => {
-				if (!response.ok) {
-					let err = await response.text();
-					console.error(err);
-					throw err;
-				} else {
-					let result = await response.json();
-					console.log(accessTokenValue);
-					console.log(result);
-					let newTickets = new Map(tickets);
-					result.forEach(
-						(ticket: {
-							movieId: any;
-							id: number;
-							showingNumber: number;
-							ticketType: number;
-							seat: string;
-						}) => {
-							if (!newTickets.has(`${ticket.movieId}`)) {
-								newTickets.set(`${ticket.movieId}`, []);
-							}
-							newTickets.get(`${ticket.movieId}`)!.push(ticket);
-						}
-					);
-
-					for (const [key, value] of newTickets) {
-						newTickets.set(key, sortArrayOfObjects(value));
-					}
-					tickets = newTickets;
-					return tickets;
+		fetch(
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/-1/showings/-1/tickets?PageNumber=1&PageSize=50`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${accessTokenValue}`
 				}
-			})
-			.catch((error) => console.error('Error getting tickets', error));
+			}
+		).then(async (response) => {
+			if (!response.ok) {
+				let err = await response.text();
+				throw err;
+			} else {
+				let result = await response.json();
+				let newTickets = new Map(tickets);
+				result.forEach(
+					(ticket: {
+						movieId: any;
+						id: number;
+						showingNumber: number;
+						ticketType: number;
+						seat: string;
+					}) => {
+						if (!newTickets.has(`${ticket.movieId}`)) {
+							newTickets.set(`${ticket.movieId}`, []);
+						}
+						newTickets.get(`${ticket.movieId}`)!.push(ticket);
+					}
+				);
+
+				for (const [key, value] of newTickets) {
+					newTickets.set(key, sortArrayOfObjects(value));
+				}
+				tickets = newTickets;
+				return tickets;
+			}
+		});
 	});
 
 	function compareShowings(a: number, b: number) {
@@ -96,24 +93,30 @@
 	}
 
 	async function getMovieName(id: number) {
-		const f = await fetch(`http://localhost:5157/api/v1/movies/${id}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${accessTokenValue}`
+		const f = await fetch(
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${id}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${accessTokenValue}`
+				}
 			}
-		});
+		);
 		return f.json();
 	}
 
 	async function getShowingTime(movieId: number, showing: number) {
-		const f = await fetch(`http://localhost:5157/api/v1/movies/${movieId}/showings/${showing}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${accessTokenValue}`
+		const f = await fetch(
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showing}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${accessTokenValue}`
+				}
 			}
-		});
+		);
 		return f.json();
 	}
 
@@ -151,7 +154,7 @@
 		tickets = newTickets;
 
 		const response = await fetch(
-			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showing}/tickets/${ticket.id}`,
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showing}/tickets/${ticket.id}`,
 			{
 				method: 'PUT',
 				headers: {
@@ -175,13 +178,12 @@
 				background: 'variant-filled-error'
 			};
 			toastStore.trigger(t);
-			console.error('Failed to upgrade ticket');
 		}
 	}
 
 	async function remove(ticket: { movieId: any; showingNumber: any; id: any }) {
 		const response = await fetch(
-			`http://localhost:5157/api/v1/movies/${ticket.movieId}/showings/${ticket.showingNumber}/tickets/${ticket.id}`,
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${ticket.movieId}/showings/${ticket.showingNumber}/tickets/${ticket.id}`,
 			{
 				method: 'DELETE',
 				headers: {
@@ -218,7 +220,6 @@
 	}
 
 	async function download(movieId: number, showingNumber: number, id: number) {
-		console.log(`${movieId} ${showingNumber} ${id}`);
 		const doc = new jsPDF();
 
 		let data = {
@@ -235,7 +236,7 @@
 		};
 
 		await fetch(
-			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingNumber}/tickets/${id}`,
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showingNumber}/tickets/${id}`,
 			{
 				method: 'GET',
 				headers: {
@@ -258,20 +259,23 @@
 				data.ticketType = r.ticketType;
 				data.seat = r.seat;
 				data.userId = r.userId;
-				await fetch(`http://localhost:5157/api/v1/movies/${movieId}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${accessTokenValue}`
+				await fetch(
+					`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${accessTokenValue}`
+						}
 					}
-				}).then(async (response) => {
+				).then(async (response) => {
 					if (!response.ok) {
 						throw await response.text();
 					} else {
 						let m = await response.json();
 						data.movieTitle = m.title;
 						await fetch(
-							`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingNumber}`,
+							`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showingNumber}`,
 							{
 								method: 'GET',
 								headers: {

@@ -142,6 +142,7 @@ public class ShowingController : ControllerBase
 
         showing.StartTime = showingDTO.StartTime;
         showing.EndTime = showingDTO.EndTime;
+        showing.Price = showingDTO.Price;
 
         await _showingRepository.UpdateAsync(showing);
 

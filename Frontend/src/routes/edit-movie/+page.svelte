@@ -74,7 +74,7 @@
 			videos: movieEdit.videos
 		};
 
-		fetch(`http://localhost:5157/api/v1/movies/${movieEdit.id}`, {
+		fetch(`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieEdit.id}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -83,10 +83,8 @@
 			body: JSON.stringify(data)
 		})
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					editResult = await response.text();
-					console.log(editResult);
 					editSuccessful = false;
 					throw editResult;
 				} else {
@@ -100,11 +98,9 @@
 				};
 				toastStore.trigger(t);
 				editSuccessful = true;
-				console.log(response);
 			})
 			.then(async () => {
 				for (const showing of showingTimes) {
-					console.log(showing);
 					let showingData = {
 						startTime: showing.startTime + ':00Z',
 						endTime: showing.endTime + ':00Z',
@@ -113,9 +109,8 @@
 						movieId: showing.movieId
 					};
 					let httpType = showingData.movieId === '' ? 'POST' : 'PUT';
-					console.log(showingData);
 					await fetch(
-						`http://localhost:5157/api/v1/movies/${movieEdit.id}/showings/${showing.number}`,
+						`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieEdit.id}/showings/${showing.number}`,
 						{
 							method: httpType,
 							headers: {
@@ -125,7 +120,6 @@
 							body: JSON.stringify(showingData)
 						}
 					).then(async (response) => {
-						console.log(response);
 						if (!response.ok) {
 							throw await response.text();
 						} else {
@@ -145,19 +139,20 @@
 					background: 'variant-filled-error'
 				};
 				toastStore.trigger(t);
-				console.error('Error editing movie', error);
 			});
 	}
 
 	onMount(() => {
-		fetch('http://localhost:5157/api/v1/movies?PageNumber=1&PageSize=50', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
+		fetch(
+			'https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies?PageNumber=1&PageSize=50',
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				}
 			}
-		})
+		)
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					throw await response.text();
 				} else {
@@ -166,17 +161,18 @@
 			})
 			.then((response) => {
 				movies = response;
-				console.log(movies);
 			})
 			.then(() => {
-				fetch(`http://localhost:5157/api/v1/movies/${movies[0].id}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json'
+				fetch(
+					`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movies[0].id}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
 					}
-				})
+				)
 					.then(async (response) => {
-						console.log(response);
 						if (!response.ok) {
 							throw await response.text();
 						} else {
@@ -186,11 +182,10 @@
 					.then((response) => {
 						movieEdit = response;
 						movieEdit.releaseDate = response.releaseDate.split('T')[0];
-						console.log(movieEdit);
 					})
 					.then(() => {
 						fetch(
-							`http://localhost:5157/api/v1/movies/${movies[0].id}/showings?PageNumber=1&PageSize=50`,
+							`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movies[0].id}/showings?PageNumber=1&PageSize=50`,
 							{
 								method: 'GET',
 								headers: {
@@ -206,30 +201,30 @@
 								}
 							})
 							.then((response) => {
-								console.log(response);
 								response.forEach((element: { endTime: any; startTime: string }) => {
 									element.startTime = dateToUserFriendly(element.startTime);
 									element.endTime = dateToUserFriendly(element.endTime);
 								});
-								console.log(response);
 								showingTimes = response;
 							});
-					})
-					.catch((error) => console.error('Error fetching movie', error));
-			})
-			.catch((error) => console.error('Error fetching movies', error));
+					});
+			});
 	});
 
 	function handleSelectChange(event: Event) {
 		if (event.target !== null) {
-			fetch(`http://localhost:5157/api/v1/movies/${(event.target as HTMLInputElement).value}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json'
+			fetch(
+				`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${
+					(event.target as HTMLInputElement).value
+				}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json'
+					}
 				}
-			})
+			)
 				.then(async (response) => {
-					console.log(response);
 					if (!response.ok) {
 						throw await response.text();
 					} else {
@@ -239,11 +234,10 @@
 				.then((response) => {
 					movieEdit = response;
 					movieEdit.releaseDate = response.releaseDate.split('T')[0];
-					console.log(movieEdit);
 				})
 				.then(() => {
 					fetch(
-						`http://localhost:5157/api/v1/movies/${movieEdit.id}/showings?PageNumber=1&PageSize=50`,
+						`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieEdit.id}/showings?PageNumber=1&PageSize=50`,
 						{
 							method: 'GET',
 							headers: {
@@ -259,23 +253,18 @@
 							}
 						})
 						.then((response) => {
-							console.log(response);
 							response.forEach((element: { endTime: any; startTime: string }) => {
 								element.startTime = dateToUserFriendly(element.startTime);
 								element.endTime = dateToUserFriendly(element.endTime);
 							});
-							console.log(response);
 							showingTimes = response;
 						});
-				})
-				.catch((error) => console.error('Error fetching movie', error))
-				.catch((error) => console.error('Error fetching movie', error));
+				});
 		}
 	}
 
 	function deleteMovie(id: number) {
-		console.log('DELETE');
-		fetch(`http://localhost:5157/api/v1/movies/${id}`, {
+		fetch(`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${id}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
@@ -283,7 +272,6 @@
 			}
 		})
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					throw await response.text();
 				} else {
@@ -295,13 +283,36 @@
 							background: 'variant-filled-success'
 						};
 						toastStore.trigger(t);
-						console.log('Movie deleted from array');
-						console.log(movies);
 						movieEdit = movies[0];
 						movieSelect.value = movies[0].id;
 						movieEdit.releaseDate = movies[0].releaseDate.split('T')[0];
 					}
 				}
+			})
+			.then(() => {
+				fetch(
+					`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieEdit.id}/showings?PageNumber=1&PageSize=50`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					}
+				)
+					.then(async (response) => {
+						if (!response.ok) {
+							throw await response.text();
+						} else {
+							return response.json();
+						}
+					})
+					.then((response) => {
+						response.forEach((element: { endTime: any; startTime: string }) => {
+							element.startTime = dateToUserFriendly(element.startTime);
+							element.endTime = dateToUserFriendly(element.endTime);
+						});
+						showingTimes = response;
+					});
 			})
 			.catch((error) => {
 				const t = {
@@ -309,14 +320,12 @@
 					background: 'variant-filled-error'
 				};
 				toastStore.trigger(t);
-				console.error('Error deleting movie', error);
 			});
 	}
 
 	function removeShowingTime(index: number): any {
-		console.log(accessTokenValue);
 		fetch(
-			`http://localhost:5157/api/v1/movies/${movieEdit.id}/showings/${showingTimes[index].number}`,
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieEdit.id}/showings/${showingTimes[index].number}`,
 			{
 				method: 'DELETE',
 				headers: {
@@ -324,16 +333,14 @@
 					'Authorization': `Bearer ${accessTokenValue}`
 				}
 			}
-		)
-			.then(async (response) => {
-				if (!response.ok) {
-					throw await response.text();
-				} else {
-					showingTimes = showingTimes.filter((_, i) => i !== index);
-					return response.json();
-				}
-			})
-			.catch((error) => console.error('Error deleting showing', error));
+		).then(async (response) => {
+			if (!response.ok) {
+				throw await response.text();
+			} else {
+				showingTimes = showingTimes.filter((_, i) => i !== index);
+				return response.json();
+			}
+		});
 	}
 
 	function addShowingTime() {
@@ -341,7 +348,6 @@
 			...showingTimes,
 			{ startTime: '', endTime: '', movieId: '', number: '', price: 0 }
 		];
-		console.log(showingTimes);
 	}
 
 	function dateToUserFriendly(date: string) {

@@ -49,10 +49,7 @@
 	 */
 	function toggleSeat(row, column) {
 		let seat = row + 1 + '-' + (column + 1);
-		console.log(seat);
-		console.log(boughtTickets);
 		let containsSeat = boughtTickets.some((t) => t.seat === seat);
-		console.log(containsSeat);
 		if (!containsSeat) {
 			seatingGrid[row][column].isOccupied = !seatingGrid[row][column].isOccupied;
 		}
@@ -72,7 +69,7 @@
 						seat: i + 1 + '-' + (j + 1)
 					};
 					await fetch(
-						`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingId}/tickets`,
+						`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showingId}/tickets`,
 						{
 							method: 'POST',
 							headers: {
@@ -81,15 +78,13 @@
 							},
 							body: JSON.stringify(data)
 						}
-					)
-						.then(async (response) => {
-							if (!response.ok) {
-								throw await response.text();
-							} else {
-								return response.json();
-							}
-						})
-						.catch((error) => console.error('Error buying ticket', error));
+					).then(async (response) => {
+						if (!response.ok) {
+							throw await response.text();
+						} else {
+							return response.json();
+						}
+					});
 				}
 			}
 		}
@@ -108,7 +103,7 @@
 		let showingId = $modalStore[0].meta.showingId;
 		initialPrice = $modalStore[0].meta.price;
 		fetch(
-			`http://localhost:5157/api/v1/movies/${movieId}/showings/${showingId}/tickets?PageNumber=1&PageSize=50&getAll=true`,
+			`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${movieId}/showings/${showingId}/tickets?PageNumber=1&PageSize=50&getAll=true`,
 			{
 				method: 'GET',
 				headers: {
@@ -116,21 +111,18 @@
 					'Authorization': `Bearer ${accessTokenValue}`
 				}
 			}
-		)
-			.then(async (response) => {
-				if (!response.ok) {
-					throw await response.text();
-				} else {
-					boughtTickets = await response.json();
-					boughtTickets.forEach((ticket) => {
-						let splitTicket = ticket.seat.split('-');
-						seatingGrid[splitTicket[0] - 1][splitTicket[1] - 1].isBought = true;
-					});
-					console.log(boughtTickets);
-					return boughtTickets;
-				}
-			})
-			.catch((error) => console.error('Error getting tickets', error));
+		).then(async (response) => {
+			if (!response.ok) {
+				throw await response.text();
+			} else {
+				boughtTickets = await response.json();
+				boughtTickets.forEach((ticket) => {
+					let splitTicket = ticket.seat.split('-');
+					seatingGrid[splitTicket[0] - 1][splitTicket[1] - 1].isBought = true;
+				});
+				return boughtTickets;
+			}
+		});
 	});
 
 	/**

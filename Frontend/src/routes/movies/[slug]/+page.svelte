@@ -46,14 +46,13 @@
 	];
 
 	onMount(() => {
-		fetch(`http://localhost:5157/api/v1/movies/${data.slug}`, {
+		fetch(`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${data.slug}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
 			}
 		})
 			.then(async (response) => {
-				console.log(response);
 				if (!response.ok) {
 					throw await response.text();
 				} else {
@@ -62,12 +61,11 @@
 			})
 			.then((response) => {
 				movie = response;
-				console.log(movie);
 				return response;
 			})
 			.then((response) => {
 				fetch(
-					`http://localhost:5157/api/v1/movies/${data.slug}/showings?PageNumber=1&PageSize=50`,
+					`https://stpp-ernestas-grubis-backend.azurewebsites.net/api/v1/movies/${data.slug}/showings?PageNumber=1&PageSize=50`,
 					{
 						method: 'GET',
 						headers: {
@@ -75,7 +73,6 @@
 						}
 					}
 				).then(async (response) => {
-					console.log(response);
 					if (!response.ok) {
 						throw await response.text();
 					} else {
@@ -83,8 +80,7 @@
 						return showings;
 					}
 				});
-			})
-			.catch((error) => console.error('Error fetching movie', error));
+			});
 	});
 
 	function carouselLeft() {
@@ -103,8 +99,6 @@
 	}
 
 	function carouselRight() {
-		console.log(elemCarousel.scrollLeft);
-		console.log(elemCarousel.scrollWidth - elemCarousel.clientWidth);
 		const x =
 			Math.ceil(elemCarousel.scrollLeft) === elemCarousel.scrollWidth - elemCarousel.clientWidth
 				? 0 // loop

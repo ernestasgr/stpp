@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "stpp-ernestas-grubis",
+      "defaultValue": "stpp-ernestas-grubis-backend",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }

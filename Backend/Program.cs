@@ -54,14 +54,14 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
 
 var app = builder.Build();
-app.UseCors(builder => builder
+/*app.UseCors(builder => builder
     .AllowAnyOrigin()
     .AllowAnyMethod()
-    .AllowAnyHeader());   
+    .AllowAnyHeader());*/
 
+app.UseSwagger();
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
