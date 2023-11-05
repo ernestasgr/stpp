@@ -121,27 +121,6 @@ _pav. 1 Sistemos architektūra_
 
 ![](./images/mobile/movie-3.png)
 
-## Filmo langas:
-- Wireframe:
-
-![](./images/wireframes/movie.png)
-
-- Realizacijos didelio lango iškarpos:
-
-![](./images/pc/movie-1.png)
-
-![](./images/pc/movie-2.png)
-
-![](./images/pc/movie-3.png)
-
-- Realizacijos mažo lango iškarpos:
-
-![](./images/mobile/movie-1.png)
-
-![](./images/mobile/movie-2.png)
-
-![](./images/mobile/movie-3.png)
-
 ## Bilieto pirkimo modalas:
 - Wireframe:
 
