@@ -64,155 +64,155 @@ _pav. 1 Sistemos architektūra_
 ## Registracija:
 - Wireframe:
 
-[](./images/wireframes/register.png)
+![](./images/wireframes/register.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/register.png)
+![](./images/pc/register.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/register.png)
+![](./images/mobile/register.png)
 
 ## Prisijungimas:
 - Wireframe:
 
-[](./images/wireframes/login.png)
+![](./images/wireframes/login.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/login.png)
+![](./images/pc/login.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/login.png)
+![](./images/mobile/login.png)
 
 ## Pagrindinis langas:
 - Wireframe:
 
-[](./images/wireframes/main.png)
+![](./images/wireframes/main.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/main.png)
+![](./images/pc/main.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/main.png)
+![](./images/mobile/main.png)
 
 ## Filmo langas:
 - Wireframe:
 
-[](./images/wireframes/movie.png)
+![](./images/wireframes/movie.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/movie-1.png)
+![](./images/pc/movie-1.png)
 
-[](./images/pc/movie-2.png)
+![](./images/pc/movie-2.png)
 
-[](./images/pc/movie-3.png)
+![](./images/pc/movie-3.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/movie-1.png)
+![](./images/mobile/movie-1.png)
 
-[](./images/mobile/movie-2.png)
+![](./images/mobile/movie-2.png)
 
-[](./images/mobile/movie-3.png)
+![](./images/mobile/movie-3.png)
 
 ## Filmo langas:
 - Wireframe:
 
-[](./images/wireframes/movie.png)
+![](./images/wireframes/movie.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/movie-1.png)
+![](./images/pc/movie-1.png)
 
-[](./images/pc/movie-2.png)
+![](./images/pc/movie-2.png)
 
-[](./images/pc/movie-3.png)
+![](./images/pc/movie-3.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/movie-1.png)
+![](./images/mobile/movie-1.png)
 
-[](./images/mobile/movie-2.png)
+![](./images/mobile/movie-2.png)
 
-[](./images/mobile/movie-3.png)
+![](./images/mobile/movie-3.png)
 
 ## Bilieto pirkimo modalas:
 - Wireframe:
 
-[](./images/wireframes/seating.png)
+![](./images/wireframes/seating.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/seating.png)
+![](./images/pc/seating.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/seating.png)
+![](./images/mobile/seating.png)
 
 ## Bilietų peržiūros langas:
 - Wireframe:
 
-[](./images/wireframes/tickets.png)
+![](./images/wireframes/tickets.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/tickets.png)
+![](./images/pc/tickets.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/tickets-1.png)
+![](./images/mobile/tickets-1.png)
 
-[](./images/mobile/tickets-2.png)
+![](./images/mobile/tickets-2.png)
 
 ## Filmo ir jo seansų kūrimo langas:
 - Wireframe:
 
-[](./images/wireframes/create-movie.png)
+![](./images/wireframes/create-movie.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/create-movie-1.png)
+![](./images/pc/create-movie-1.png)
 
-[](./images/pc/create-movie-2.png)
+![](./images/pc/create-movie-2.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/create-movie-1.png)
+![](./images/mobile/create-movie-1.png)
 
-[](./images/mobile/create-movie-2.png)
+![](./images/mobile/create-movie-2.png)
 
-[](./images/mobile/create-movie-3.png)
+![](./images/mobile/create-movie-3.png)
 
 ## Filmo ir jo seansų redagavimo langas:
 - Wireframe:
 
-[](./images/wireframes/edit-movie.png)
+![](./images/wireframes/edit-movie.png)
 
 - Realizacijos didelio lango iškarpos:
 
-[](./images/pc/edit-movie-1.png)
+![](./images/pc/edit-movie-1.png)
 
-[](./images/pc/edit-movie-2.png)
+![](./images/pc/edit-movie-2.png)
 
-[](./images/pc/edit-movie-3.png)
+![](./images/pc/edit-movie-3.png)
 
-[](./images/pc/edit-movie-4.png)
+![](./images/pc/edit-movie-4.png)
 
 - Realizacijos mažo lango iškarpos:
 
-[](./images/mobile/edit-movie-1.png)
+![](./images/mobile/edit-movie-1.png)
 
-[](./images/mobile/edit-movie-2.png)
+![](./images/mobile/edit-movie-2.png)
 
-[](./images/mobile/edit-movie-3.png)
+![](./images/mobile/edit-movie-3.png)
 
-[](./images/mobile/edit-movie-4.png)
+![](./images/mobile/edit-movie-4.png)
 
 # 5. API specifikacija
 
@@ -1169,7 +1169,7 @@ HTTP kodas 200
 
 - HTTP kodas 400, jei blogas prisijungimas
 
-# 5. Išvados
+# 6. Išvados
 
 - Sėkmingai sukurtas programinis produktas;
 - Išmokta realizuoti autentifikaciją / autorizaciją su JWT
