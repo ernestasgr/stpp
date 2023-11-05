@@ -63,97 +63,160 @@ _pav. 1 Sistemos architektūra_
 
 ## Registracija:
 - Wireframe:
+
 [](./images/wireframes/register.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/register.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/register.png)
 
 ## Prisijungimas:
 - Wireframe:
+
 [](./images/wireframes/login.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/login.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/login.png)
 
 ## Pagrindinis langas:
 - Wireframe:
+
 [](./images/wireframes/main.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/main.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/main.png)
 
 ## Filmo langas:
 - Wireframe:
+
 [](./images/wireframes/movie.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/movie-1.png)
+
 [](./images/pc/movie-2.png)
+
 [](./images/pc/movie-3.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/movie-1.png)
+
 [](./images/mobile/movie-2.png)
+
 [](./images/mobile/movie-3.png)
 
 ## Filmo langas:
 - Wireframe:
+
 [](./images/wireframes/movie.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/movie-1.png)
+
 [](./images/pc/movie-2.png)
+
 [](./images/pc/movie-3.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/movie-1.png)
+
 [](./images/mobile/movie-2.png)
+
 [](./images/mobile/movie-3.png)
 
 ## Bilieto pirkimo modalas:
 - Wireframe:
+
 [](./images/wireframes/seating.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/seating.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/seating.png)
 
 ## Bilietų peržiūros langas:
 - Wireframe:
+
 [](./images/wireframes/tickets.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/tickets.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/tickets-1.png)
+
 [](./images/mobile/tickets-2.png)
 
 ## Filmo ir jo seansų kūrimo langas:
 - Wireframe:
+
 [](./images/wireframes/create-movie.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/create-movie-1.png)
+
 [](./images/pc/create-movie-2.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/create-movie-1.png)
+
 [](./images/mobile/create-movie-2.png)
+
 [](./images/mobile/create-movie-3.png)
 
 ## Filmo ir jo seansų redagavimo langas:
 - Wireframe:
+
 [](./images/wireframes/edit-movie.png)
+
 - Realizacijos didelio lango iškarpos:
+
 [](./images/pc/edit-movie-1.png)
+
 [](./images/pc/edit-movie-2.png)
+
 [](./images/pc/edit-movie-3.png)
+
 [](./images/pc/edit-movie-4.png)
+
 - Realizacijos mažo lango iškarpos:
+
 [](./images/mobile/edit-movie-1.png)
+
 [](./images/mobile/edit-movie-2.png)
+
 [](./images/mobile/edit-movie-3.png)
+
 [](./images/mobile/edit-movie-4.png)
 
-# 4. API specifikacija
+# 5. API specifikacija
 
-## 4.1. Movie
+## 5.1. Movie
 
 ### POST /api/v1/movies
 
@@ -482,7 +545,7 @@ HTTP kodas 204
 
 - HTTP kodas 404, jei movie objektas su nurodytu movieId neegzistuoja
 
-## Showing
+## 5.2 Showing
 
 ### POST /api/v1/movies/{movieId}/showings
 
@@ -738,7 +801,7 @@ HTTP kodas 204
 
 - HTTP kodas 404, jei Showing objektas su nurodytu movieId ir showingId neegzistuoja
 
-## Ticket
+## 5.3. Ticket
 
 ### POST /api/v1/movies/{movieId}/showings/{showingId}/tickets
 
@@ -1013,7 +1076,7 @@ HTTP kodas 204
 - HTTP kodas 404, jei Ticket objektas su nurodytu movieId ir showingId ir ticketId neegzistuoja
 - HTTP kodas 400, jei Showing objekto startTime \< dabartinis laikas
 
-## User
+## 5.4. User
 
 ### POST /api/v1/register
 
