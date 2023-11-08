@@ -134,7 +134,7 @@ _pav. 1 Sistemos architektūra_
 
 ![](./images/mobile/seating.png)
 
-## Bilietų peržiūros langas:
+## Bilietų peržiūros langas (PATAISYTA):
 - Wireframe:
 
 ![](./images/wireframes/tickets.png)
@@ -149,7 +149,7 @@ _pav. 1 Sistemos architektūra_
 
 ![](./images/mobile/tickets-2.png)
 
-## Filmo ir jo seansų kūrimo langas:
+## Filmo ir jo seansų kūrimo langas (PATAISYTA):
 - Wireframe:
 
 ![](./images/wireframes/create-movie.png)
@@ -168,7 +168,9 @@ _pav. 1 Sistemos architektūra_
 
 ![](./images/mobile/create-movie-3.png)
 
-## Filmo ir jo seansų redagavimo langas:
+![](./images/mobile/create-movie-4.png)
+
+## Filmo ir jo seansų redagavimo langas (PATAISYTA):
 - Wireframe:
 
 ![](./images/wireframes/edit-movie.png)
@@ -182,6 +184,8 @@ _pav. 1 Sistemos architektūra_
 ![](./images/pc/edit-movie-3.png)
 
 ![](./images/pc/edit-movie-4.png)
+
+![](./images/pc/edit-movie-5.png)
 
 - Realizacijos mažo lango iškarpos:
 

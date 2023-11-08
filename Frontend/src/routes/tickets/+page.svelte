@@ -346,67 +346,77 @@
 	}
 </script>
 
-<strong class="uppercase text-l"><span style="color:#d4163c">My</span> Tickets:</strong>
-{#each [...tickets] as [key, value]}
-	{#await getMovieName(key)}
-		<p>...waiting</p>
-	{:then movie}
-		<h2>Movie: {movie.title}</h2>
-		<div class="table-container">
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th>Showing</th>
-						<th class="table-sort-asc">Seat</th>
-						<th>Price</th>
-						<th>Ticket Type</th>
-						{#if isAdmin}
-							<th>User</th>
-						{/if}
-					</tr>
-				</thead>
-				<tbody>
-					{#each value as t}
-						<tr>
-							{#await getShowingTime(key, t.showingNumber)}
-								<p>...waiting</p>
-							{:then showing}
-								<td>
-									{dateToUserFriendly(showing.startTime)} -
-									{dateToUserFriendly(showing.endTime).split(' ')[1]}
-								</td>
-								<td>{t.seat}</td>
-								<td>{t.ticketType === 1 ? showing.price * 1.5 : showing.price}€</td>
-								<td>
-									<span class="mr-2">{ticketTypeToUserFriendly(t.ticketType)}</span>
-									{#if t.ticketType === 0}
-										<button
-											type="button"
-											on:click={() => upgrade(movie.id, showing.number, t)}
-											class="text-blue-500 hover:text-blue-700 mr-2">Upgrade</button
-										>
+<div class="container mx-auto">
+	<div class="max-w-5xl mx-auto">
+		<br/>
+		<strong class="uppercase text-xl"><span style="color:#d4163c">My</span> Tickets:</strong>
+		<br/>
+		{#each [...tickets] as [key, value]}
+			<br/>
+			{#await getMovieName(key)}
+				<p>...waiting</p>
+			{:then movie}
+			<strong class="uppercase text-l"><span style="color:#d4163c">Movie</span> {movie.title}:</strong>
+			<br/>
+				<div class="table-container">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>Showing</th>
+								<th class="table-sort-asc">Seat</th>
+								<th>Price</th>
+								<th>Ticket Type</th>
+								{#if isAdmin}
+									<th>User</th>
+								{/if}
+							</tr>
+						</thead>
+						<tbody>
+							{#each value as t}
+								<tr>
+									{#await getShowingTime(key, t.showingNumber)}
+										<p>...waiting</p>
+									{:then showing}
+										<td>
+											{dateToUserFriendly(showing.startTime)} -
+											{dateToUserFriendly(showing.endTime).split(' ')[1]}
+										</td>
+										<td>{t.seat}</td>
+										<td>{t.ticketType === 1 ? showing.price * 1.5 : showing.price}€</td>
+										<td>
+											<span class="mr-2">{ticketTypeToUserFriendly(t.ticketType)}</span>
+											{#if t.ticketType === 0}
+												<button
+													type="button"
+													on:click={() => upgrade(movie.id, showing.number, t)}
+													class="text-blue-500 hover:text-blue-700 mr-2">Upgrade</button
+												>
+											{/if}
+
+											<button
+												type="button"
+												on:click={() => remove(t)}
+												class="text-red-500 hover:text-red-700 mr-2">Delete</button
+											>
+
+											<button
+												type="button"
+												on:click={() => download(movie.id, showing.number, t.id)}
+												class="text-green-500 hover:text-green-500 mr-2">Download</button
+											>
+										</td>
+									{/await}
+									{#if isAdmin}
+										<td>{t.userId}</td>
 									{/if}
-
-									<button
-										type="button"
-										on:click={() => remove(t)}
-										class="text-red-500 hover:text-red-700 mr-2">Delete</button
-									>
-
-									<button
-										type="button"
-										on:click={() => download(movie.id, showing.number, t.id)}
-										class="text-green-500 hover:text-green-500 mr-2">Download</button
-									>
-								</td>
-							{/await}
-							{#if isAdmin}
-								<td>{t.userId}</td>
-							{/if}
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</div>
-	{/await}
-{/each}
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/await}
+		{/each}
+		<br/>
+		<br/>
+	</div>
+</div>
